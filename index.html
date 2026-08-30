@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APP Operations Dashboard — 27 Aug 2026</title>
+<style>
+  :root {
+    /* Accenture Brand Colors */
+    --acc-purple: #A100FF;
+    --acc-purple-dark: #7800C4;
+    --acc-purple-light: #E5B3FF;
+    --acc-purple-bg: #F5E6FF;
+    --acc-black: #000000;
+    --acc-white: #FFFFFF;
+    --acc-gray-100: #F2F2F2;
+    --acc-gray-200: #E6E6E6;
+    --acc-gray-300: #CCCCCC;
+    --acc-gray-400: #999999;
+    --acc-gray-500: #666666;
+    --acc-gray-700: #333333;
+
+    /* Semantic */
+    --bg: #0A0A0A;
+    --surface: #141414;
+    --surface2: #1E1E1E;
+    --surface3: #282828;
+    --border: #2E2E2E;
+    --border2: #3D3D3D;
+    --text: #F2F2F2;
+    --text2: #CCCCCC;
+    --muted: #808080;
+
+    /* Accent palette mapped to Accenture */
+    --primary: #A100FF;
+    --primary-dim: #1A0029;
+    --primary-light: #CC66FF;
+
+    --green: #00CC88;
+    --green-dim: #00231A;
+
+    --amber: #FF6600;
+    --amber-dim: #2A1100;
+
+    --teal: #00BAFF;
+    --teal-dim: #001E2A;
+
+    --red: #FF3333;
+    --red-dim: #2A0000;
+
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 28px 24px;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  }
+  .phl { display: flex; align-items: center; gap: 14px; }
+  .acc-logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .acc-chevron {
+    width: 36px; height: 36px;
+    background: var(--acc-purple);
+    clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%, 30% 50%);
+    flex-shrink: 0;
+  }
+  .page-title { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+  .page-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .acc-brand-tag {
+    font-size: 11px; font-weight: 700; color: var(--acc-purple);
+    border: 1.5px solid var(--acc-purple);
+    padding: 4px 12px; border-radius: 2px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .export-btn {
+    background: var(--acc-purple);
+    border: none; color: #fff;
+    padding: 9px 18px; border-radius: 2px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 7px;
+    transition: background 0.15s; font-family: inherit;
+    letter-spacing: 0.03em;
+  }
+  .export-btn:hover { background: var(--acc-purple-dark); }
+
+  /* ── Divider ── */
+  .acc-divider {
+    height: 2px;
+    background: linear-gradient(90deg, var(--acc-purple) 0%, var(--acc-purple-dark) 50%, transparent 100%);
+    margin-bottom: 22px;
+    border-radius: 1px;
+  }
+
+  /* ── Tabs ── */
+  .tab-bar {
+    display: flex; gap: 0;
+    border-bottom: 2px solid var(--border2);
+    margin-bottom: 22px;
+  }
+  .tab {
+    padding: 9px 20px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none;
+    background: transparent; color: var(--muted);
+    transition: all 0.15s; font-family: inherit;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    letter-spacing: 0.02em;
+  }
+  .tab.active {
+    color: var(--acc-purple);
+    border-bottom: 2px solid var(--acc-purple);
+  }
+  .tab:not(.active):hover { color: var(--text2); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  /* ── Sub-tabs ── */
+  .subtab-bar {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border2);
+    margin-bottom: 20px; margin-top: 2px;
+  }
+  .subtab {
+    padding: 7px 16px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; background: transparent;
+    color: var(--muted); transition: all 0.15s; font-family: inherit;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    letter-spacing: 0.02em;
+  }
+  .subtab.active { color: var(--acc-purple); border-bottom: 2px solid var(--acc-purple); }
+  .subtab:not(.active):hover { color: var(--text2); }
+  .subtab-content { display: none; }
+  .subtab-content.active { display: block; }
+
+
+  /* ── Tiles ── */
+  .tiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    cursor: pointer; transition: all 0.18s;
+    position: relative; overflow: hidden;
+    border-left: 3px solid var(--tile-color, var(--primary));
+  }
+  .tile:hover { background: var(--surface2); transform: translateY(-1px); }
+  .tile.active {
+    background: var(--tile-dim, var(--primary-dim));
+    border-color: var(--tile-color, var(--primary));
+    border-left-color: var(--tile-color, var(--primary));
+  }
+  .tile-icon { font-size: 20px; margin-bottom: 8px; }
+  .tile-val {
+    font-size: 36px; font-weight: 700; letter-spacing: -0.02em;
+    color: var(--tile-color, var(--primary)); line-height: 1;
+  }
+  .tile-label { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 5px; }
+  .tile-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .tile-hint { font-size: 10px; color: var(--muted); margin-top: 8px; opacity: 0.7; }
+
+  /* ── Drill sections ── */
+  .drill-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .drill-section-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px;
+  }
+  .drill-btns { display: flex; flex-wrap: wrap; gap: 7px; }
+  .dbtn {
+    padding: 5px 13px; border-radius: 2px;
+    border: 1px solid var(--border2);
+    background: transparent; color: var(--muted);
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all 0.13s; font-family: inherit;
+    letter-spacing: 0.03em;
+  }
+  .dbtn:hover { background: var(--surface2); color: var(--text); border-color: var(--acc-purple); }
+  .dbtn.on { color: var(--btn-color); background: var(--btn-dim); border-color: var(--btn-color); }
+
+  /* ── Panels ── */
+  .panels-wrap { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 18px;
+    flex: 1 1 270px; min-width: 240px; max-width: 380px;
+    border-top: 2px solid var(--acc-purple);
+  }
+  .panel-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .panel-title { font-size: 11px; font-weight: 700; color: var(--acc-purple); text-transform: uppercase; letter-spacing: 0.06em; }
+  .close-x { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px; }
+  .close-x:hover { color: var(--text); }
+  .bar-row { margin-bottom: 9px; }
+  .bar-meta { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .bar-name { font-size: 12px; color: var(--muted); }
+  .bar-num { font-size: 12px; font-weight: 700; color: var(--text); }
+  .bar-track { height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+
+  /* ── GCP ── */
+  .gcp-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px; margin-bottom: 14px;
+  }
+  .gcp-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 18px;
+    border-top: 2px solid var(--acc-purple);
+  }
+  .gcp-card-title {
+    font-size: 11px; font-weight: 700; color: var(--acc-purple);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
+  }
+
+  /* ── Loaned ── */
+  .loaned-split {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 18px;
+  }
+  @media(max-width:680px) { .loaned-split { grid-template-columns: 1fr; } }
+  .loaned-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px;
+  }
+  .loaned-in { border-top: 3px solid var(--green); }
+  .loaned-out { border-top: 3px solid var(--amber); }
+  .loaned-card-header {
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 14px;
+  }
+  .loaned-badge {
+    width: 36px; height: 36px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .loaned-card-title { font-size: 14px; font-weight: 700; }
+  .loaned-card-count { font-size: 32px; font-weight: 700; }
+  .loaned-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .detail-label {
+    font-size: 10px; font-weight: 700; color: var(--acc-purple);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 8px; margin-top: 14px;
+    border-left: 2px solid var(--acc-purple); padding-left: 7px;
+  }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .pill {
+    padding: 3px 9px; border-radius: 2px;
+    font-size: 11px; font-weight: 600; border: 1px solid;
+  }
+  .pill-purple { background: var(--primary-dim); color: var(--primary-light); border-color: var(--acc-purple); }
+  .pill-green { background: var(--green-dim); color: var(--green); border-color: var(--green); }
+  .pill-amber { background: var(--amber-dim); color: var(--amber); border-color: var(--amber); }
+  .pill-teal { background: var(--teal-dim); color: var(--teal); border-color: var(--teal); }
+
+  .wbse-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .wbse-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 12px; text-align: center; flex: 1;
+  }
+  .wbse-val { font-size: 20px; font-weight: 700; }
+  .wbse-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .exception-bar {
+    display: flex; height: 8px; border-radius: 2px;
+    overflow: hidden; margin-top: 8px; margin-bottom: 5px;
+  }
+  .ex-yes { background: var(--amber); }
+  .ex-no { background: var(--green); }
+  .ex-legend { display: flex; gap: 14px; font-size: 11px; color: var(--muted); }
+  .ex-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+
+  /* ── Tables ── */
+  .tbl-wrap { overflow-x: auto; margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    background: var(--surface2); color: var(--acc-purple);
+    font-weight: 700; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    padding: 9px 12px; text-align: left;
+    border-bottom: 1px solid var(--acc-purple);
+    white-space: nowrap;
+  }
+  td {
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+    color: var(--text); vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  .tag {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 2px; font-size: 10px; font-weight: 700;
+  }
+  .tag-ie { background: var(--primary-dim); color: var(--primary-light); }
+  .tag-tech { background: var(--teal-dim); color: var(--teal); }
+  .tag-del { background: var(--green-dim); color: var(--green); }
+  .tag-sec { background: var(--red-dim); color: var(--red); }
+  .tag-am { background: var(--green-dim); color: var(--green); }
+  .tag-m { background: var(--amber-dim); color: var(--amber); }
+  .tag-tl { background: var(--teal-dim); color: var(--teal); }
+  .tag-sse { background: var(--primary-dim); color: var(--primary-light); }
+
+  /* ── Footer ── */
+  .page-footer {
+    margin-top: 28px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 8px;
+  }
+  .footer-text { font-size: 11px; color: var(--muted); }
+  .footer-acc {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .footer-chevron {
+    width: 18px; height: 18px;
+    background: var(--acc-purple);
+    clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%, 30% 50%);
+  }
+  .footer-brand { font-size: 12px; font-weight: 700; color: var(--acc-purple); letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="page-header">
+  <div class="phl">
+    <div class="acc-logo">
+      <div class="acc-chevron"></div>
+      <div>
+        <div class="page-title">APP Operations Dashboard</div>
+        <div class="page-sub">Report Date: 27 Aug 2026 &nbsp;·&nbsp; Total HC: 1,894 &nbsp;·&nbsp; ATCI: 1,869</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="acc-brand-tag">Accenture</div>
+    <button class="export-btn" onclick="exportDashboard()">&#11015; Download HTML</button>
+  </div>
+</div>
+<div class="acc-divider"></div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab('hc')">Headcount Dashboard</button>
+  <button class="tab" onclick="switchTab('demands')">Demands Dashboard</button>
+</div>
+
+<!-- ══ TAB: DEMANDS PLACEHOLDER ══ -->
+<div id="tab-demands" class="tab-content">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;text-align:center;padding:40px 20px">
+    <div style="width:72px;height:72px;border-radius:50%;background:var(--primary-dim);border:2px solid var(--acc-purple);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:24px">📋</div>
+    <div style="font-size:22px;font-weight:700;color:var(--acc-purple);margin-bottom:10px;letter-spacing:-0.01em">Demands Dashboard</div>
+    <div style="font-size:14px;color:var(--text2);max-width:420px;line-height:1.7;margin-bottom:28px">
+      Demand data will be loaded here once the report is available.<br>
+      Upload the Demands file tomorrow to activate this dashboard.
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:32px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--acc-purple);border-radius:var(--radius);padding:14px 22px;min-width:140px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:var(--muted)">—</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Total Demands</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:var(--radius);padding:14px 22px;min-width:140px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:var(--muted)">—</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Open Demands</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:var(--radius);padding:14px 22px;min-width:140px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:var(--muted)">—</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">In Pipeline</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:var(--radius);padding:14px 22px;min-width:140px;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:var(--muted)">—</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Fulfilled</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--acc-purple);border-radius:var(--radius);padding:12px 24px;display:inline-flex;align-items:center;gap:10px">
+      <span style="font-size:18px">⏳</span>
+      <span style="font-size:13px;color:var(--acc-purple);font-weight:600">Data expected 28 Aug 2026 — upload to activate</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB 1: HEADCOUNT ══ -->
+<div id="tab-hc" class="tab-content active">
+
+  <div class="subtab-bar">
+    <button class="subtab active" onclick="switchSubtab('sub-overview')">Overview</button>
+    <button class="subtab" onclick="switchSubtab('sub-loaned')">Loaned Resources</button>
+    <button class="subtab" onclick="switchSubtab('sub-gcp')">GCP — Outside India</button>
+  </div>
+
+  <!-- ── Sub-tab: Overview ── -->
+  <div id="sub-overview" class="subtab-content active">
+  <div class="tiles-grid">
+    <div class="tile" style="--tile-color:var(--primary);--tile-dim:var(--primary-dim)" id="t-hl" onclick="toggleSection('sec-hl')">
+      <div class="tile-icon">🔒</div>
+      <div class="tile-val">1,823</div>
+      <div class="tile-label">ATCI Locked HC</div>
+      <div class="tile-sub">Hard Lock (HL)</div>
+      <div class="tile-hint">▾ Drill down</div>
+    </div>
+    <div class="tile" style="--tile-color:var(--green);--tile-dim:var(--green-dim)" id="t-sh" onclick="toggleSection('sec-sh')">
+      <div class="tile-icon">🔗</div>
+      <div class="tile-val">46</div>
+      <div class="tile-label">Shared Lock</div>
+      <div class="tile-sub">Lock Type: SH</div>
+      <div class="tile-hint">▾ Drill down</div>
+    </div>
+    <div class="tile" style="--tile-color:var(--amber);--tile-dim:var(--amber-dim)" id="t-loan" onclick="switchSubtab('sub-loaned')">
+      <div class="tile-icon">✈️</div>
+      <div class="tile-val">148</div>
+      <div class="tile-label">Loaned</div>
+      <div class="tile-sub">In: 123 &nbsp;|&nbsp; Out: 25</div>
+      <div class="tile-hint">→ Loaned Resources</div>
+    </div>
+    <div class="tile" style="--tile-color:var(--teal);--tile-dim:var(--teal-dim)" id="t-gcp" onclick="switchSubtab('sub-gcp')">
+      <div class="tile-icon">🌏</div>
+      <div class="tile-val">24</div>
+      <div class="tile-label">GCP</div>
+      <div class="tile-sub">Global Commuters (Non-India)</div>
+      <div class="tile-hint">→ GCP sub-tab</div>
+    </div>
+  </div>
+
+  <div id="sec-hl" class="drill-section" style="display:none">
+    <div class="drill-section-label">🔒 ATCI Locked HC — Drill Down</div>
+    <div class="drill-btns">
+      <button class="dbtn" style="--btn-color:var(--primary);--btn-dim:var(--primary-dim)" onclick="togglePanel('level')">By Level</button>
+      <button class="dbtn" style="--btn-color:var(--primary);--btn-dim:var(--primary-dim)" onclick="togglePanel('loc')">By Location</button>
+      <button class="dbtn" style="--btn-color:var(--primary);--btn-dim:var(--primary-dim)" onclick="togglePanel('du')">By Delivery Unit</button>
+      <button class="dbtn" style="--btn-color:var(--primary);--btn-dim:var(--primary-dim)" onclick="togglePanel('client')">By Client</button>
+      <button class="dbtn" style="--btn-color:var(--primary);--btn-dim:var(--primary-dim)" onclick="togglePanel('skill')">By Skill Domain</button>
+      <button class="dbtn" style="--btn-color:var(--primary);--btn-dim:var(--primary-dim)" onclick="togglePanel('ind')">By Industry Segment</button>
+    </div>
+  </div>
+  <div id="sec-sh" class="drill-section" style="display:none">
+    <div class="drill-section-label">🔗 Shared Lock — Drill Down</div>
+    <div class="drill-btns">
+      <button class="dbtn" style="--btn-color:var(--green);--btn-dim:var(--green-dim)" onclick="togglePanel('shmu')">By Market Unit</button>
+    </div>
+  </div>
+  <div class="panels-wrap" id="panels-hc"></div>
+  </div><!-- end sub-overview -->
+
+  <!-- ── Sub-tab: Loaned Resources ── -->
+  <div id="sub-loaned" class="subtab-content">
+  <div class="loaned-split">
+    <!-- IN -->
+    <div class="loaned-card loaned-in">
+      <div class="loaned-card-header">
+        <div class="loaned-badge" style="background:var(--green-dim)">📥</div>
+        <div>
+          <div class="loaned-card-title" style="color:var(--green)">Loaned INTO APP</div>
+          <div class="loaned-sub">From external capabilities / markets</div>
+        </div>
+      </div>
+      <div class="loaned-card-count" style="color:var(--green)">123</div>
+      <div class="loaned-sub">Resources borrowed by APP DUs</div>
+      <div class="detail-label">Receiving DU</div>
+      <div id="loaned-in-du"></div>
+      <div class="detail-label">Source — Capability / Market</div>
+      <div id="loaned-in-cap"></div>
+      <div class="detail-label">WBSE Type</div>
+      <div class="wbse-row">
+        <div class="wbse-item"><div class="wbse-val" style="color:var(--green)">100</div><div class="wbse-lbl">Internal</div></div>
+        <div class="wbse-item"><div class="wbse-val" style="color:var(--amber)">17</div><div class="wbse-lbl">External / Client</div></div>
+        <div class="wbse-item"><div class="wbse-val" style="color:var(--red)">6</div><div class="wbse-lbl">Moved out</div></div>
+      </div>
+      <div class="detail-label">Exception Needed</div>
+      <div class="exception-bar"><div class="ex-yes" style="width:69%"></div><div class="ex-no" style="width:31%"></div></div>
+      <div class="ex-legend"><span><span class="ex-dot" style="background:var(--amber)"></span>Yes — 85</span><span><span class="ex-dot" style="background:var(--green)"></span>No — 38</span></div>
+      <div class="detail-label">Top Skills</div>
+      <div class="pill-row">
+        <span class="pill pill-green">CSV (11)</span><span class="pill pill-green">Java SE (6)</span>
+        <span class="pill pill-green">Spring Boot (6)</span><span class="pill pill-green">DevOps (6)</span>
+        <span class="pill pill-green">ML (4)</span><span class="pill pill-green">AWS (4)</span>
+        <span class="pill pill-green">Selenium (4)</span>
+      </div>
+    </div>
+    <!-- OUT -->
+    <div class="loaned-card loaned-out">
+      <div class="loaned-card-header">
+        <div class="loaned-badge" style="background:var(--amber-dim)">📤</div>
+        <div>
+          <div class="loaned-card-title" style="color:var(--amber)">Loaned OUT of APP</div>
+          <div class="loaned-sub">To local entities (Local ICI movement)</div>
+        </div>
+      </div>
+      <div class="loaned-card-count" style="color:var(--amber)">25</div>
+      <div class="loaned-sub">APP resources loaned to other units</div>
+      <div class="detail-label">APP DU (Source)</div>
+      <div id="loaned-out-du"></div>
+      <div class="detail-label">Level Breakdown</div>
+      <div id="loaned-out-level"></div>
+      <div class="detail-label">Skill Domain</div>
+      <div class="pill-row">
+        <span class="pill pill-amber">IE — 12</span><span class="pill pill-teal">Technology — 6</span>
+        <span class="pill pill-green">Delivery — 5</span><span class="pill pill-amber">Security — 2</span>
+      </div>
+      <div class="detail-label">Industry Segment</div>
+      <div id="loaned-out-ind"></div>
+      <div class="detail-label">Location</div>
+      <div class="pill-row">
+        <span class="pill pill-amber">Bengaluru 16</span><span class="pill pill-amber">Chennai 2</span>
+        <span class="pill pill-amber">Gurugram 2</span><span class="pill pill-amber">Others 5</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="drill-section">
+    <div class="drill-section-label">📤 Loaned OUT — Resource Detail</div>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>Name</th><th>Level</th><th>Client</th><th>APP DU</th><th>Domain</th><th>Location</th><th>Industry</th></tr></thead>
+      <tbody id="loaned-out-table"></tbody></table>
+    </div>
+  </div>
+  </div><!-- end sub-loaned -->
+
+  <!-- ── Sub-tab: GCP ── -->
+  <div id="sub-gcp" class="subtab-content">
+  <div class="gcp-overview">
+    <div class="gcp-card">
+      <div class="gcp-card-title">Total GCP (Non-India)</div>
+      <div style="font-size:46px;font-weight:700;color:var(--acc-purple);line-height:1.1">24</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">Global Commuter Program</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">23 flagged GCP=Y + 1 Germany</div>
+    </div>
+    <div class="gcp-card">
+      <div class="gcp-card-title">By Country</div>
+      <div id="gcp-country-bars"></div>
+    </div>
+    <div class="gcp-card">
+      <div class="gcp-card-title">By Region</div>
+      <div id="gcp-region-bars"></div>
+    </div>
+    <div class="gcp-card">
+      <div class="gcp-card-title">By Level</div>
+      <div id="gcp-level-bars"></div>
+    </div>
+  </div>
+  <div class="gcp-overview">
+    <div class="gcp-card">
+      <div class="gcp-card-title">By Delivery Unit</div>
+      <div id="gcp-du-bars"></div>
+    </div>
+    <div class="gcp-card">
+      <div class="gcp-card-title">By Industry Segment</div>
+      <div id="gcp-ind-bars"></div>
+    </div>
+    <div class="gcp-card">
+      <div class="gcp-card-title">By Client</div>
+      <div id="gcp-client-bars"></div>
+    </div>
+  </div>
+
+  <div class="drill-section">
+    <div class="drill-section-label">🌏 GCP — Full Resource List</div>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>Name</th><th>Level</th><th>Country</th><th>Location</th><th>Client</th><th>DU</th><th>Industry</th><th>GCP Start</th></tr></thead>
+      <tbody id="gcp-table"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="page-footer">
+  <span class="footer-text">APP Operations Dashboard &nbsp;·&nbsp; 27 Aug 2026</span>
+  <div class="footer-acc">
+    <div class="footer-chevron"></div>
+    <span class="footer-brand">Accenture Products Platform</span>
+  </div>
+</div>
+
+<script>
+const PD = {
+  level:{title:'By Management Level',color:'#A100FF',data:[['SSE',440],['SE',437],['TL',348],['AM',214],['ASE',212],['M',114],['SM',39],['AD',15],['MD',4]]},
+  loc:  {title:'By Location',color:'#A100FF',data:[['Bengaluru',726],['Hyderabad',349],['Chennai',190],['Gurugram',113],['Mumbai',107],['Pune',102],['Coimbatore',65],['Kolkata',58],['Noida',53],['Bhubaneswar',25]]},
+  du:   {title:'By Delivery Unit',color:'#A100FF',data:[['APP-NP-PS',256],['APP-ALIP-PE',216],['APP-HPS-AHSS',170],['APP-RAI-PE',158],['APP-LS-INTIENT-PE',155],['APTP',149],['APP-AVS-PS',108],['APP-ASCG-OP-PS',98],['APP-ASCG-PE',97],['APP-AVS-PE',89]]},
+  client:{title:'By Client (Top 10)',color:'#A100FF',data:[['Cross Client',1324],['BARCLAYS',82],['PEPSICO',78],['NESTLÉ',50],['ING',41],['MERCK',32],['UNILEVER',26],['FERRERO',25],['MARS INC',25],['DIAGEO PLC',18]]},
+  skill:{title:'By Skill Domain',color:'#A100FF',data:[['Technology',1573],['Industry',177],['IE',70],['Delivery',27],['Security',19],['Function',2],['Language',1]]},
+  ind:  {title:'By Industry Segment',color:'#A100FF',data:[['CG&S, Retail, Travel',545],['Software & Platforms',404],['Insurance',215],['Life Sciences',176],['Comms & Media',176],['Public Service',170],['Banking & Cap Mkts',151]]},
+  shmu: {title:'By Market Unit (Shared Lock)',color:'#00CC88',data:[['Accenture Products',28],['Software Engineering',14],['Asset Eng Hub',1],['Products & Platforms',1],['EMEA-CEE',1]]},
+};
+
+const LIN_DU   = [['APP-ALIP-PE',25],['APP-LS-INTIENT-PE',25],['APP-AVS-PE',20],['APP-D&AI-PE',15],['APP-ASCG-OP-PS',7],['APP-ALV-PE',6],['APP-AVS-PS',6],['APP-NP-PE',6],['APTP',5],['APP-LS-INTIENT-PS',4],['APP-ASCG-Cloud-PS',3],['APP-NP-PS',1]];
+const LIN_CAP  = [['S&PE',41],['AI & Data',20],['Life Sciences',13],['FS Industry',9],['CMT Industry',6],['Song',5],['Americas Mkt',4],['Infra-Eng',4],['Industry X',4],['Cloud First',3],['Ent. Platforms',3],['APAC Market',3]];
+const LOUT_DU  = [['APTP',6],['APP-LS-INTIENT-PE',3],['APP-ASCG-PE',3],['APP-HPS-AHSS',3],['APP-AVS-PS',2],['APP-NFR-PE',2],['APP-RAI-PE',1],['APP-ALIP-PE',1],['APP-D&AI-PE',1],['APP-CFP',1],['APP-AFTP',1],['APP Biz Enablement',1]];
+const LOUT_LVL = [['SSE',10],['TL',7],['SE',3],['AM',3],['M',1],['ASE',1]];
+const LOUT_IND = [['Banking & Cap Mkts',6],['CG&S, Retail, Travel',5],['Software & Platforms',4],['Life Sciences',3],['Public Service',3],['Comms & Media',2],['Insurance',1]];
+const LOUT_TBL = [
+  ['Krupa A. Ramoliya','SSE','BARCLAYS','APTP','IE','Ahmedabad','Banking'],
+  ['Roshan Suban Sab','SE','LIBERTY GLOBAL','APP-AVS-PS','Tech','Bengaluru','Comms & Media'],
+  ['Vicky Matani','AM','ING','APTP','Tech','Mumbai','Banking'],
+  ['NISHA ANN','SSE','HSBC GROUP','APTP','IE','Bengaluru','Banking'],
+  ['Manjunath KP','SSE','FORENINGEN BANKDATA','APTP','IE','Bengaluru','Banking'],
+  ['Satya Prakash Anand','M','BARCLAYS','APTP','IE','Bengaluru','Banking'],
+  ['Anbarasan Shanmugham','SSE','Cross Client','APP-LS-INTIENT-PE','Security','Chennai','Life Sciences'],
+  ['Pavan Kumar Natraj','TL','Cross Client','APP Biz Enablement','Delivery','Bengaluru','—'],
+  ['Arvind Jha','SSE','Cross Client','APP-RAI-PE','Delivery','Gurugram','S&Platforms'],
+  ['Sumi Varghese','SSE','Cross Client','APP-AFTP','Delivery','Bengaluru','S&Platforms'],
+  ['Antara Holkar','SSE','Cross Client','APP-ALIP-PE','Delivery','Indore','Insurance'],
+  ['Jayashree A Naidu','SSE','Cross Client','APP-LS-INTIENT-PE','Delivery','Bengaluru','Life Sciences'],
+  ['Neelu Kumari','TL','Cross Client','APP-LS-INTIENT-PE','Tech','Noida','Life Sciences'],
+  ['Vardhireddy Meghana','ASE','Cross Client','APP-ASCG-PE','IE','Bengaluru','CG&S'],
+  ['Renold I. Robin','TL','Cross Client','APP-ASCG-PE','IE','Bengaluru','CG&S'],
+  ['Laxmikantha Gu','TL','Cross Client','APP-ASCG-PE','IE','Bengaluru','CG&S'],
+  ['Ishita Padharia','AM','Cross Client','APP-CFP','Tech','Pune','S&Platforms'],
+  ['Leyon Thampi','SSE','Cross Client','APP-HPS-AHSS','IE','Bengaluru','Public Service'],
+  ['Kiruthiga Srinivasan','TL','Cross Client','APP-HPS-AHSS','IE','Chennai','Public Service'],
+  ['Mritunjay Kumar','SE','Cross Client','APP-HPS-AHSS','Tech','Bengaluru','Public Service'],
+  ['Bhagavantha D. Rao','AM','Cross Client','APP-NFR-PE','IE','Bengaluru','CG&S'],
+  ['Divyashree Jayakumar','SE','Cross Client','APP-NFR-PE','Security','Bengaluru','CG&S'],
+  ['Malarvannan M.','TL','Cross Client','APP-AVS-PS','IE','Bengaluru','Comms & Media'],
+  ['Shahnoor Alam','SSE','Cross Client','APP-D&AI-PE','Tech','Gurugram','S&Platforms'],
+  ['Subhankar Dawn','TL','BARCLAYS','APTP','IE','Bengaluru','Banking'],
+];
+
+const GCP_COUNTRY = [['USA',15],['Malaysia',4],['United Kingdom',4],['Germany',1]];
+const GCP_REGION  = [['Americas',15],['Asia Oceania',4],['EMEA',5]];
+const GCP_LEVEL   = [['AM',13],['M',5],['TL',5],['SSE',1]];
+const GCP_DU      = [['APP-HPS-AHSS',6],['APP-NP-PS',4],['APP-AVS-PS',4],['APP-LS-INTIENT-PE',3],['APP-ALIP-PE',2],['APP-ASCG-OP-PS',2],['APP-LS-INTIENT-PS',2],['APP-ASCG-PE',1]];
+const GCP_IND     = [['CG&S, Retail, Travel',7],['Public Service',6],['Life Sciences',5],['Comms & Media',2],['Insurance',2],['Software & Platforms',2]];
+const GCP_CLIENT  = [['Cross Client',15],['MERCK',3],['LIBERTY GLOBAL',2],['CHANNEL FOUR TV',2],['BAYER',1],['ROCHE',1]];
+const GCP_TBL = [
+  ['Pranao Hardas','AM','USA','Austin','Cross Client','APP-HPS-AHSS','Public Service','18 Aug 2023'],
+  ['Raghav Mani','AM','Malaysia','Kuala Lumpur','Cross Client','APP-NP-PS','CG&S','25 Jul 2022'],
+  ['Shivakumar Prabhakararao','AM','USA','Camden','Cross Client','APP-ASCG-OP-PS','CG&S','11 Jun 2018'],
+  ['Tulasi Ram Ballina','M','USA','Cincinnati','Cross Client','APP-ASCG-OP-PS','CG&S','03 Oct 2016'],
+  ['BALANANDA KUMAR INTIPALLI','AM','USA','Austin','Cross Client','APP-HPS-AHSS','Public Service','16 Dec 2024'],
+  ['Rudrama Raju Chilukala','M','USA','Austin','Cross Client','APP-HPS-AHSS','Public Service','10 Dec 2018'],
+  ['Chetan C. Kumar','TL','USA','Austin','Cross Client','APP-HPS-AHSS','Public Service','09 Jun 2023'],
+  ['Veena Kabekkodu','AM','USA','Austin','Cross Client','APP-HPS-AHSS','Public Service','10 Jul 2025'],
+  ['Vinay Shukla','M','USA','Austin','Cross Client','APP-HPS-AHSS','Public Service','14 Mar 2022'],
+  ['Dhanushree S M Sankanahalli','SSE','Malaysia','Kuala Lumpur','Cross Client','APP-NP-PS','CG&S','19 Feb 2020'],
+  ['Santosh Kumar Kushwaha','TL','Malaysia','Kuala Lumpur','Cross Client','APP-NP-PS','CG&S','17 May 2017'],
+  ['Prakash Thirugnanam','AM','Malaysia','Kuala Lumpur','Cross Client','APP-NP-PS','CG&S','14 Mar 2019'],
+  ['Kannan Samynathan','AM','United Kingdom','Central London','LIBERTY GLOBAL','APP-AVS-PS','Comms & Media','07 Nov 2022'],
+  ['Anil Karunakaran','M','USA','Berwyn','Cross Client','APP-ALIP-PE','Insurance','22 May 2023'],
+  ['Swarnali Sarkar','AM','United Kingdom','London','CHANNEL FOUR TV','APP-AVS-PS','S&Platforms','24 Jul 2025'],
+  ['Nayeem Gani','AM','United Kingdom','Central London','LIBERTY GLOBAL','APP-AVS-PS','Comms & Media','02 Apr 2024'],
+  ['Sunil Kumar Kakarla','TL','United Kingdom','London','CHANNEL FOUR TV','APP-AVS-PS','S&Platforms','06 Jan 2026'],
+  ['Roshini Gayathri','AM','USA','Berwyn','MERCK','APP-LS-INTIENT-PE','Life Sciences','04 Mar 2022'],
+  ['Shripad Bhat','AM','USA','Berwyn','MERCK','APP-LS-INTIENT-PE','Life Sciences','16 Jan 2025'],
+  ['Sujeeth Kumar Manchagaiah','M','USA','Chesterbrook','MERCK','APP-LS-INTIENT-PE','Life Sciences','25 Jul 2018'],
+  ['Maheswaran Manickam','AM','USA','Berwyn','BAYER','APP-LS-INTIENT-PS','Life Sciences','23 Sep 2022'],
+  ['Nikhil C. Gupta','AM','USA','Florham Park','Cross Client','APP-ALIP-PE','Insurance','06 Dec 2021'],
+  ['Vinit Garg','TL','USA','Berwyn','ROCHE','APP-LS-INTIENT-PS','Life Sciences','26 Jul 2024'],
+  ['Manish Lakhera','TL','Germany','Kaiserslautern','Cross Client','APP-ASCG-PE','CG&S','—'],
+];
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function miniBar(data, id, color) {
+  const el = document.getElementById(id); if (!el) return;
+  const max = Math.max(...data.map(d=>d[1]));
+  el.innerHTML = data.map(([l,v]) => `<div class="bar-row">
+    <div class="bar-meta"><span class="bar-name">${l}</span><span class="bar-num">${v}</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/max*100)}%;background:${color}"></div></div>
+  </div>`).join('');
+}
+
+let openPanels = new Set();
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(b=>{if((b.getAttribute('onclick')||'').includes(`'${id}'`))b.classList.add('active');});
+}
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  const show = el.style.display==='none';
+  el.style.display = show?'block':'none';
+  const m={'sec-hl':'t-hl','sec-sh':'t-sh'};
+  if(m[id]) document.getElementById(m[id]).classList.toggle('active',show);
+  if(!show){
+    const pm={'sec-hl':['level','loc','du','client','skill','ind'],'sec-sh':['shmu']};
+    (pm[id]||[]).forEach(p=>{openPanels.delete(p);});
+    renderPanels();
+    el.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('on'));
+  }
+}
+
+function togglePanel(id) {
+  if(openPanels.has(id)){
+    openPanels.delete(id);
+    document.querySelectorAll('.dbtn').forEach(b=>{if((b.getAttribute('onclick')||'').includes(`'${id}'`))b.classList.remove('on');});
+  } else {
+    openPanels.add(id);
+    document.querySelectorAll('.dbtn').forEach(b=>{if((b.getAttribute('onclick')||'').includes(`'${id}'`))b.classList.add('on');});
+  }
+  renderPanels();
+}
+
+function renderPanels() {
+  const c = document.getElementById('panels-hc'); c.innerHTML='';
+  openPanels.forEach(id=>{
+    const cfg=PD[id]; if(!cfg) return;
+    const max=Math.max(...cfg.data.map(d=>d[1]));
+    const div=document.createElement('div'); div.className='panel';
+    div.innerHTML=`<div class="panel-hdr"><span class="panel-title">${cfg.title}</span><button class="close-x" onclick="togglePanel('${id}')">×</button></div>`
+      +cfg.data.map(([l,v])=>`<div class="bar-row">
+        <div class="bar-meta"><span class="bar-name">${l}</span><span class="bar-num">${v.toLocaleString()}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/max*100)}%;background:${cfg.color}"></div></div>
+      </div>`).join('');
+    c.appendChild(div);
+  });
+}
+
+function exportDashboard() {
+  const b=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='APP_HC_Dashboard_27Aug2026.html'; a.click();
+}
+
+const DTAG={'IE':'tag-ie','Tech':'tag-tech','Delivery':'tag-del','Security':'tag-sec'};
+const LTAG={'AM':'tag-am','M':'tag-m','TL':'tag-tl','SSE':'tag-sse','SE':'tag-tl','ASE':'tag-ie'};
+
+// Init bars
+miniBar(LIN_DU,  'loaned-in-du',  '#00CC88');
+miniBar(LIN_CAP, 'loaned-in-cap', '#00BAFF');
+miniBar(LOUT_DU, 'loaned-out-du', '#FF6600');
+miniBar(LOUT_LVL,'loaned-out-level','#FF6600');
+miniBar(LOUT_IND,'loaned-out-ind','#FF6600');
+miniBar(GCP_COUNTRY,'gcp-country-bars','#A100FF');
+miniBar(GCP_REGION, 'gcp-region-bars', '#A100FF');
+miniBar(GCP_LEVEL,  'gcp-level-bars',  '#A100FF');
+miniBar(GCP_DU,     'gcp-du-bars',     '#A100FF');
+miniBar(GCP_IND,    'gcp-ind-bars',    '#A100FF');
+miniBar(GCP_CLIENT, 'gcp-client-bars', '#A100FF');
+
+document.getElementById('loaned-out-table').innerHTML=LOUT_TBL.map(([n,l,cl,du,dm,lo,ind])=>
+  `<tr><td style="font-weight:600">${n}</td><td><span class="tag ${LTAG[l]||''}">${l}</span></td><td style="font-size:11px">${cl}</td><td style="font-size:11px">${du}</td><td><span class="tag ${DTAG[dm]||''}">${dm}</span></td><td style="font-size:11px">${lo}</td><td style="font-size:11px;color:var(--muted)">${ind}</td></tr>`
+).join('');
+
+document.getElementById('gcp-table').innerHTML=GCP_TBL.map(([n,l,cy,lo,cl,du,ind,st])=>
+  `<tr><td style="font-weight:600">${n}</td><td><span class="tag ${LTAG[l]||''}">${l}</span></td><td style="font-size:11px">${cy}</td><td style="font-size:11px">${lo}</td><td style="font-size:11px">${cl}</td><td style="font-size:11px">${du}</td><td style="font-size:11px;color:var(--muted)">${ind}</td><td style="font-size:11px;color:var(--muted)">${st}</td></tr>`
+).join('');
+function switchSubtab(id) {
+  document.querySelectorAll('.subtab-content').forEach(e => e.classList.remove('active'));
+  document.querySelectorAll('.subtab').forEach(e => e.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.subtab').forEach(b => {
+    if ((b.getAttribute('onclick') || '').includes("'" + id + "'")) b.classList.add('active');
+  });
+}
+</script>
+</body>
+</html>
