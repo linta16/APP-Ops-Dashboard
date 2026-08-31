@@ -366,39 +366,158 @@
   <button class="tab" onclick="switchTab('demands')">Demands Dashboard</button>
 </div>
 
-<!-- ══ TAB: DEMANDS PLACEHOLDER ══ -->
+
+<!-- ══ TAB 2: DEMANDS DASHBOARD ══ -->
 <div id="tab-demands" class="tab-content">
-  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;text-align:center;padding:40px 20px">
-    <div style="width:72px;height:72px;border-radius:50%;background:var(--primary-dim);border:2px solid var(--acc-purple);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:24px">📋</div>
-    <div style="font-size:22px;font-weight:700;color:var(--acc-purple);margin-bottom:10px;letter-spacing:-0.01em">Demands Dashboard</div>
-    <div style="font-size:14px;color:var(--text2);max-width:420px;line-height:1.7;margin-bottom:28px">
-      Demand data will be loaded here once the report is available.<br>
-      Upload the Demands file tomorrow to activate this dashboard.
+
+  <!-- Sub-tabs -->
+  <div class="subtab-bar">
+    <button class="subtab active" onclick="switchSubtab('dem-overview')">Overview</button>
+    <button class="subtab" onclick="switchSubtab('dem-bydu')">By Delivery Unit</button>
+    <button class="subtab" onclick="switchSubtab('dem-byskill')">By Skill</button>
+    <button class="subtab" onclick="switchSubtab('dem-ageing')">Ageing</button>
+  </div>
+
+  <!-- ── SUB: OVERVIEW ── -->
+  <div id="dem-overview" class="subtab-content active">
+    <div class="tiles-grid">
+      <div class="tile" style="--tile-color:var(--primary);--tile-dim:var(--primary-dim)">
+        <div class="tile-icon">📋</div>
+        <div class="tile-val">250</div>
+        <div class="tile-label">Total Demands</div>
+        <div class="tile-sub">All position statuses</div>
+      </div>
+      <div class="tile" style="--tile-color:var(--amber);--tile-dim:var(--amber-dim)">
+        <div class="tile-icon">🔓</div>
+        <div class="tile-val">227</div>
+        <div class="tile-label">Open Demands</div>
+        <div class="tile-sub">In Process: 124 &nbsp;|&nbsp; NFB: 102 &nbsp;|&nbsp; Confirming: 1</div>
+      </div>
+      <div class="tile" style="--tile-color:var(--green);--tile-dim:var(--green-dim)">
+        <div class="tile-icon">✅</div>
+        <div class="tile-val">23</div>
+        <div class="tile-label">Filled — Pending Joiner</div>
+        <div class="tile-sub">All ESR approved</div>
+      </div>
+      <div class="tile" style="--tile-color:var(--teal);--tile-dim:var(--teal-dim)">
+        <div class="tile-icon">📅</div>
+        <div class="tile-val">378</div>
+        <div class="tile-label">Avg. Ageing (Days)</div>
+        <div class="tile-sub">173 demands aged 365d+</div>
+      </div>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:32px">
-      <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--acc-purple);border-radius:var(--radius);padding:14px 22px;min-width:140px;text-align:center">
-        <div style="font-size:28px;font-weight:700;color:var(--muted)">—</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">Total Demands</div>
+
+    <!-- Row 2: Approval type + Status breakdown -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px">
+
+      <div class="gcp-card">
+        <div class="gcp-card-title">By SR Type of Approval</div>
+        <div id="dem-approval-bars"></div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:var(--radius);padding:14px 22px;min-width:140px;text-align:center">
-        <div style="font-size:28px;font-weight:700;color:var(--muted)">—</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">Open Demands</div>
+
+      <div class="gcp-card">
+        <div class="gcp-card-title">Position Status Breakdown</div>
+        <div id="dem-status-bars"></div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:var(--radius);padding:14px 22px;min-width:140px;text-align:center">
-        <div style="font-size:28px;font-weight:700;color:var(--muted)">—</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">In Pipeline</div>
+
+      <div class="gcp-card">
+        <div class="gcp-card-title">By Demand Segmentation</div>
+        <div id="dem-seg-bars"></div>
+        <div style="margin-top:14px">
+          <div class="gcp-card-title">By Rate Type</div>
+          <div id="dem-rate-bars"></div>
+        </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:var(--radius);padding:14px 22px;min-width:140px;text-align:center">
-        <div style="font-size:28px;font-weight:700;color:var(--muted)">—</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">Fulfilled</div>
+
+      <div class="gcp-card">
+        <div class="gcp-card-title">By Industry Alignment</div>
+        <div id="dem-ind-bars"></div>
       </div>
+
     </div>
-    <div style="background:var(--surface);border:1px solid var(--acc-purple);border-radius:var(--radius);padding:12px 24px;display:inline-flex;align-items:center;gap:10px">
-      <span style="font-size:18px">⏳</span>
-      <span style="font-size:13px;color:var(--acc-purple);font-weight:600">Data expected 28 Aug 2026 — upload to activate</span>
+
+    <!-- Row 3: Commitment month -->
+    <div class="gcp-card" style="margin-bottom:14px">
+      <div class="gcp-card-title">Scheduling Commitment Month</div>
+      <div id="dem-month-bars" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px"></div>
+    </div>
+
+  </div>
+
+  <!-- ── SUB: BY DU ── -->
+  <div id="dem-bydu" class="subtab-content">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px">
+      <div class="gcp-card">
+        <div class="gcp-card-title">All Demands by DU</div>
+        <div id="dem-du-all"></div>
+      </div>
+      <div class="gcp-card">
+        <div class="gcp-card-title">Open Demands by DU</div>
+        <div id="dem-du-open"></div>
+      </div>
+      <div class="gcp-card">
+        <div class="gcp-card-title">By Management Level</div>
+        <div id="dem-level-bars"></div>
+      </div>
+      <div class="gcp-card">
+        <div class="gcp-card-title">By Business Group (Top 10)</div>
+        <div id="dem-bg-bars"></div>
+      </div>
     </div>
   </div>
+
+  <!-- ── SUB: BY SKILL ── -->
+  <div id="dem-byskill" class="subtab-content">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px">
+      <div class="gcp-card">
+        <div class="gcp-card-title">Top 15 Primary Skills — All</div>
+        <div id="dem-skill-all"></div>
+      </div>
+      <div class="gcp-card">
+        <div class="gcp-card-title">Top 15 Primary Skills — Open Only</div>
+        <div id="dem-skill-open"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUB: AGEING ── -->
+  <div id="dem-ageing" class="subtab-content">
+    <div class="tiles-grid" style="margin-bottom:14px">
+      <div class="tile" style="--tile-color:var(--green);--tile-dim:var(--green-dim)">
+        <div class="tile-icon">⚡</div><div class="tile-val">10</div>
+        <div class="tile-label">0–90 Days</div><div class="tile-sub">Fresh demands</div>
+      </div>
+      <div class="tile" style="--tile-color:var(--amber);--tile-dim:var(--amber-dim)">
+        <div class="tile-icon">⏳</div><div class="tile-val">67</div>
+        <div class="tile-label">91–365 Days</div><div class="tile-sub">Ageing demands</div>
+      </div>
+      <div class="tile" style="--tile-color:var(--red);--tile-dim:var(--red-dim)">
+        <div class="tile-icon">🔴</div><div class="tile-val">173</div>
+        <div class="tile-label">365+ Days</div><div class="tile-sub">Critical — needs attention</div>
+      </div>
+      <div class="tile" style="--tile-color:var(--primary);--tile-dim:var(--primary-dim)">
+        <div class="tile-icon">📅</div><div class="tile-val">1856</div>
+        <div class="tile-label">Max Ageing</div><div class="tile-sub">Oldest open demand</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+      <div class="gcp-card">
+        <div class="gcp-card-title">Ageing Buckets</div>
+        <div id="dem-age-buckets"></div>
+      </div>
+      <div class="gcp-card">
+        <div class="gcp-card-title">365d+ Demands by DU</div>
+        <div id="dem-age-du"></div>
+      </div>
+      <div class="gcp-card">
+        <div class="gcp-card-title">365d+ by Position Status</div>
+        <div id="dem-age-status"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
+
 
 <!-- ══ TAB 1: HEADCOUNT ══ -->
 <div id="tab-hc" class="tab-content active">
@@ -406,7 +525,7 @@
   <div class="subtab-bar">
     <button class="subtab active" onclick="switchSubtab('sub-overview')">Overview</button>
     <button class="subtab" onclick="switchSubtab('sub-loaned')">Loaned Resources</button>
-    <button class="subtab" onclick="switchSubtab('sub-gcp')">GCP — Outside India</button>
+    <button class="subtab" onclick="switchSubtab('sub-gcp')">GCP — Global Career Program</button>
   </div>
 
   <!-- ── Sub-tab: Overview ── -->
@@ -435,10 +554,10 @@
     </div>
     <div class="tile" style="--tile-color:var(--teal);--tile-dim:var(--teal-dim)" id="t-gcp" onclick="switchSubtab('sub-gcp')">
       <div class="tile-icon">🌏</div>
-      <div class="tile-val">24</div>
+      <div class="tile-val">23</div>
       <div class="tile-label">GCP</div>
-      <div class="tile-sub">Global Commuters (Non-India)</div>
-      <div class="tile-hint">→ GCP sub-tab</div>
+      <div class="tile-sub">Global Career Program</div>
+      <div class="tile-hint">→ Global Career Program</div>
     </div>
   </div>
 
@@ -540,10 +659,10 @@
   <div id="sub-gcp" class="subtab-content">
   <div class="gcp-overview">
     <div class="gcp-card">
-      <div class="gcp-card-title">Total GCP (Non-India)</div>
-      <div style="font-size:46px;font-weight:700;color:var(--acc-purple);line-height:1.1">24</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">Global Commuter Program</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:2px">23 flagged GCP=Y + 1 Germany</div>
+      <div class="gcp-card-title">Total GCP</div>
+      <div style="font-size:46px;font-weight:700;color:var(--acc-purple);line-height:1.1">23</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">Global Career Program</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">India-based resources deployed globally</div>
     </div>
     <div class="gcp-card">
       <div class="gcp-card-title">By Country</div>
@@ -574,7 +693,7 @@
   </div>
 
   <div class="drill-section">
-    <div class="drill-section-label">🌏 GCP — Full Resource List</div>
+    <div class="drill-section-label">🌏 GCP — Global Career Program · Full Resource List</div>
     <div class="tbl-wrap">
       <table><thead><tr><th>Name</th><th>Level</th><th>Country</th><th>Location</th><th>Client</th><th>DU</th><th>Industry</th><th>GCP Start</th></tr></thead>
       <tbody id="gcp-table"></tbody></table>
@@ -635,10 +754,10 @@ const LOUT_TBL = [
   ['Subhankar Dawn','TL','BARCLAYS','APTP','IE','Bengaluru','Banking'],
 ];
 
-const GCP_COUNTRY = [['USA',15],['Malaysia',4],['United Kingdom',4],['Germany',1]];
-const GCP_REGION  = [['Americas',15],['Asia Oceania',4],['EMEA',5]];
-const GCP_LEVEL   = [['AM',13],['M',5],['TL',5],['SSE',1]];
-const GCP_DU      = [['APP-HPS-AHSS',6],['APP-NP-PS',4],['APP-AVS-PS',4],['APP-LS-INTIENT-PE',3],['APP-ALIP-PE',2],['APP-ASCG-OP-PS',2],['APP-LS-INTIENT-PS',2],['APP-ASCG-PE',1]];
+const GCP_COUNTRY = [['USA',15],['Malaysia',4],['United Kingdom',4]];
+const GCP_REGION  = [['Americas',15],['Asia Oceania',4],['EMEA',4]];
+const GCP_LEVEL   = [['AM',13],['M',5],['TL',4],['SSE',1]];
+const GCP_DU      = [['APP-HPS-AHSS',6],['APP-NP-PS',4],['APP-AVS-PS',4],['APP-LS-INTIENT-PE',3],['APP-ALIP-PE',2],['APP-ASCG-OP-PS',2],['APP-LS-INTIENT-PS',2]];
 const GCP_IND     = [['CG&S, Retail, Travel',7],['Public Service',6],['Life Sciences',5],['Comms & Media',2],['Insurance',2],['Software & Platforms',2]];
 const GCP_CLIENT  = [['Cross Client',15],['MERCK',3],['LIBERTY GLOBAL',2],['CHANNEL FOUR TV',2],['BAYER',1],['ROCHE',1]];
 const GCP_TBL = [
@@ -665,7 +784,6 @@ const GCP_TBL = [
   ['Maheswaran Manickam','AM','USA','Berwyn','BAYER','APP-LS-INTIENT-PS','Life Sciences','23 Sep 2022'],
   ['Nikhil C. Gupta','AM','USA','Florham Park','Cross Client','APP-ALIP-PE','Insurance','06 Dec 2021'],
   ['Vinit Garg','TL','USA','Berwyn','ROCHE','APP-LS-INTIENT-PS','Life Sciences','26 Jul 2024'],
-  ['Manish Lakhera','TL','Germany','Kaiserslautern','Cross Client','APP-ASCG-PE','CG&S','—'],
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -735,6 +853,57 @@ function exportDashboard() {
 
 const DTAG={'IE':'tag-ie','Tech':'tag-tech','Delivery':'tag-del','Security':'tag-sec'};
 const LTAG={'AM':'tag-am','M':'tag-m','TL':'tag-tl','SSE':'tag-sse','SE':'tag-tl','ASE':'tag-ie'};
+
+// ── DEMANDS DATA ────────────────────────────────────────────────────────────────
+const DEM_APPROVAL   = [['Internal',183],['Approved for ESR',60],['Approved for CSR',7]];
+const DEM_STATUS     = [['Open - In Process',124],['Open - Need Project Feedback',102],['Filled - Pending Joiner',23],['Open - Confirming Candidate',1]];
+const DEM_SEG        = [['New',239],['Backfill',11]];
+const DEM_RATE       = [['Short Term',228],['Long Term',13],['IDB Long Term',9]];
+const DEM_IND        = [['Comms & Media',92],['Software & Platforms',48],['Banking & Cap Mkts',41],['Not specified',25],['CG&S, Retail, Travel',23],['Insurance',11],['Life Sciences',10]];
+const DEM_DU_ALL     = [['APP-AVS-PS',88],['APTP',41],['APP-AVS-PE',37],['APP Biz Enablement',25],['APP-NP-PS',20],['APP-ALIP-PE',11],['APP-LS-INTIENT-PE',9],['APP-RAI-PE',5],['APP-D&AI-PE',3],['APP-NP-PE',3],['APP-ASCENTIA-PE',2],['APP-CFP',2],['APP-LS-INTIENT-PS',1],['APP-ALV-PE',1],['APP-ASCG-OP-PS',1]];
+const DEM_DU_OPEN    = [['APP-AVS-PS',87],['APTP',38],['APP-AVS-PE',35],['APP-NP-PS',20],['APP-ALIP-PE',11],['APP Biz Enablement',10],['APP-LS-INTIENT-PE',8],['APP-RAI-PE',5],['APP-D&AI-PE',3],['APP-NP-PE',3]];
+const DEM_LEVEL      = [['10',76],['9',63],['8',46],['11',37],['7',16],['12',7],['5',3],['6',1],['Acc. Leadership',1]];
+const DEM_BG         = [['Tech_Java Technology Platform',72],['Tech_Quality Engg',21],['Tech_Song',18],['Tech_Other',18],['Tech_Data',16],['Tech_Microsoft Platform',14],['IE_Cloud Operations',13],['Tech_Artificial Intelligence',12],['Tech_Cloud Computing',11],['Tech_DevOps',10]];
+const DEM_SKILL_ALL  = [['Node.js',24],['Java Standard Edition',21],['Go Programming Language',18],['Spring Boot',16],['AWS Architecture',12],['Kubernetes',11],['DevOps',10],['UX Design',9],['Functional Test Planning',9],['AI Agents & Workflow',8],['Automated Testing',6],['Microsoft ASP.NET',6],['Software Product Mgmt',6],['Elastic Stack (ELK)',5],['PHP',5]];
+const DEM_SKILL_OPEN = [['Node.js',22],['Java Standard Edition',19],['Go Programming Language',18],['Spring Boot',14],['AWS Architecture',12],['Kubernetes',10],['Functional Test Planning',9],['DevOps',8],['AI Agents & Workflow',8],['UX Design',7],['Elastic Stack (ELK)',5],['PHP',5],['Microsoft ASP.NET',4],['Software Product Mgmt',4],['Automated Testing',4]];
+const DEM_MONTHS     = [['Oct-2026',80],['Nov-2026',49],['Sep-2026',44],['Dec-2026',16],['Jan-2027',9],['Jul-2026',21],['Apr-2026',6],['Jun-2026',7],['Dec-2025',10],['Aug-2026',5],['Mar-2026',1],['May-2026',1],['Feb-2026',1]];
+const DEM_AGE_BUCKETS= [['0-30d',3],['31-60d',2],['61-90d',5],['91-180d',26],['181-365d',41],['365d+',173]];
+const DEM_AGE_DU     = [['APP-AVS-PS',71],['APTP',28],['APP-AVS-PE',27],['APP Biz Enablement',16],['APP-NP-PS',14],['APP-ALIP-PE',8],['APP-LS-INTIENT-PE',5],['APP-RAI-PE',3]];
+const DEM_AGE_STATUS = [['Open - In Process',91],['Open - Need Project Feedback',75],['Filled - Pending Joiner',7]];
+
+const DEM_MONTH_COLORS = {'Oct-2026':'#A100FF','Nov-2026':'#8800DD','Sep-2026':'#CC66FF','Dec-2026':'#6600BB','Jan-2027':'#4400AA','Jul-2026':'#00BAFF','Apr-2026':'#00CC88','Jun-2026':'#00AA77','Dec-2025':'#FF6600','Aug-2026':'#FFAA00','Mar-2026':'#808080','May-2026':'#808080','Feb-2026':'#808080'};
+
+function initDemands() {
+  miniBar(DEM_APPROVAL,    'dem-approval-bars',  '#A100FF');
+  miniBar(DEM_STATUS,      'dem-status-bars',    '#A100FF');
+  miniBar(DEM_SEG,         'dem-seg-bars',       '#00CC88');
+  miniBar(DEM_RATE,        'dem-rate-bars',      '#00BAFF');
+  miniBar(DEM_IND,         'dem-ind-bars',       '#A100FF');
+  miniBar(DEM_DU_ALL,      'dem-du-all',         '#A100FF');
+  miniBar(DEM_DU_OPEN,     'dem-du-open',        '#FF6600');
+  miniBar(DEM_LEVEL,       'dem-level-bars',     '#A100FF');
+  miniBar(DEM_BG,          'dem-bg-bars',        '#00BAFF');
+  miniBar(DEM_SKILL_ALL,   'dem-skill-all',      '#A100FF');
+  miniBar(DEM_SKILL_OPEN,  'dem-skill-open',     '#FF6600');
+  miniBar(DEM_AGE_BUCKETS, 'dem-age-buckets',    '#A100FF');
+  miniBar(DEM_AGE_DU,      'dem-age-du',         '#FF3333');
+  miniBar(DEM_AGE_STATUS,  'dem-age-status',     '#FF3333');
+
+  // Month bubbles
+  const mc = document.getElementById('dem-month-bars');
+  if (!mc) return;
+  const sorted = [...DEM_MONTHS].sort((a,b) => b[1]-a[1]);
+  mc.innerHTML = sorted.map(([m,v]) => {
+    const c = DEM_MONTH_COLORS[m] || '#A100FF';
+    return `<div style="text-align:center;background:var(--surface2);border:1px solid ${c};border-radius:8px;padding:10px 14px;min-width:80px">
+      <div style="font-size:20px;font-weight:700;color:${c}">${v}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:3px">${m}</div>
+    </div>`;
+  }).join('');
+}
+
+// init on load
+initDemands();
 
 // Init bars
 miniBar(LIN_DU,  'loaned-in-du',  '#00CC88');
