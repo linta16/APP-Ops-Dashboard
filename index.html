@@ -147,7 +147,7 @@
 
 <div class="header">
   <h1>APP HC Operations Dashboard</h1>
-  <div class="date-badge">HC Report: 17 Sep 2026</div>
+  <div class="date-badge">HC: 17 Sep 2026 &nbsp;|&nbsp; Demands: 08 Sep 2026</div>
 </div>
 
 <div class="main-tabs">
@@ -185,11 +185,11 @@
         </div>
         <div class="tile">
           <div class="val">473</div>
-          <div class="lbl">PS (Product Services)</div>
+          <div class="lbl">PS – Professional Services</div>
         </div>
         <div class="tile blue">
           <div class="val">1,378</div>
-          <div class="lbl">PE (Platform Engineering)</div>
+          <div class="lbl">PE – Product Engineering</div>
         </div>
         <div class="tile amber">
           <div class="val">25</div>
@@ -338,7 +338,7 @@
           <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
             <div style="text-align:center">
               <div style="font-size:2.2rem;font-weight:800;color:var(--teal)">473</div>
-              <div style="font-size:.82rem;color:var(--text2);font-weight:600">PS – Product Services</div>
+              <div style="font-size:.82rem;color:var(--text2);font-weight:600">PS – Professional Services</div>
               <div style="font-size:.78rem;color:var(--text2)">25.6%</div>
             </div>
             <div style="flex:1;height:24px;background:#f0f2f7;border-radius:12px;overflow:hidden;min-width:200px">
@@ -347,7 +347,7 @@
             </div>
             <div style="text-align:center">
               <div style="font-size:2.2rem;font-weight:800;color:var(--purple)">1,378</div>
-              <div style="font-size:.82rem;color:var(--text2);font-weight:600">PE – Platform Engineering</div>
+              <div style="font-size:.82rem;color:var(--text2);font-weight:600">PE – Product Engineering</div>
               <div style="font-size:.78rem;color:var(--text2)">74.4%</div>
             </div>
           </div>
@@ -422,19 +422,326 @@
   </div>
   <div class="subtab-content active" id="demandssub-overview">
     <div class="container">
-      <div class="card" style="text-align:center;padding:40px">
-        <div style="font-size:3rem;margin-bottom:12px">📋</div>
-        <div style="font-size:1.1rem;font-weight:700;color:var(--text2)">No Demands Data Loaded</div>
-        <div style="color:var(--text2);font-size:.88rem;margin-top:6px">Upload a Demands extract to populate this section.</div>
+      <!-- Summary tiles -->
+      <div class="tiles">
+        <div class="tile"><div class="val">246</div><div class="lbl">Total Open Demands</div></div>
+        <div class="tile blue"><div class="val">142</div><div class="lbl">Open – In Process</div></div>
+        <div class="tile amber"><div class="val">86</div><div class="lbl">Open – Need Project Feedback</div></div>
+        <div class="tile green"><div class="val">18</div><div class="lbl">Filled – Pending Joiner</div></div>
+        <div class="tile red"><div class="val">26</div><div class="lbl">Ageing 365+ Days</div></div>
+        <div class="tile" style="border-top-color:#ff6b81"><div class="val" style="color:#ff6b81">36</div><div class="lbl">Ageing 180–364 Days</div></div>
+        <div class="tile" style="border-top-color:#ffb300"><div class="val" style="color:#ffb300">36</div><div class="lbl">Ageing 90–179 Days</div></div>
+        <div class="tile" style="border-top-color:#00c48c"><div class="val" style="color:#00c48c">148</div><div class="lbl">Ageing &lt; 90 Days</div></div>
+      </div>
+
+      <!-- By DU + By Level -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Open Demands by DU</span></div>
+          <div class="card-body" style="padding:0;max-height:400px;overflow-y:auto">
+            <table id="demand-du-table">
+              <thead><tr><th>DU</th><th>Total</th><th>In Process</th><th>Need Feedback</th><th>Filled Pending</th></tr></thead>
+              <tbody id="demand-du-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Open Demands by Level</span></div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>Level</th><th>Count</th><th style="min-width:160px">Distribution</th></tr></thead>
+              <tbody id="demand-level-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ageing table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Demands Ageing Detail</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="skill-select" id="ageing-status-filter" onchange="renderAgeingTable()" style="width:auto;padding:6px 10px;font-size:.8rem">
+              <option value="">All Statuses</option>
+              <option value="Open - In Process">Open – In Process</option>
+              <option value="Open - Need Project Feedback">Open – Need Project Feedback</option>
+              <option value="Filled - Pending Joiner">Filled – Pending Joiner</option>
+            </select>
+            <select class="skill-select" id="ageing-bucket-filter" onchange="renderAgeingTable()" style="width:auto;padding:6px 10px;font-size:.8rem">
+              <option value="">All Ages</option>
+              <option value="365+">365+ days</option>
+              <option value="180-364">180–364 days</option>
+              <option value="90-179">90–179 days</option>
+              <option value="&lt;90">&lt;90 days</option>
+            </select>
+            <select class="skill-select" id="ageing-du-filter" onchange="renderAgeingTable()" style="width:auto;padding:6px 10px;font-size:.8rem">
+              <option value="">All DUs</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;max-height:480px;overflow-y:auto">
+          <table>
+            <thead><tr><th>RRD</th><th>DU</th><th>Level</th><th>Skill</th><th>Location</th><th>Create Date</th><th>Age</th><th>Status</th></tr></thead>
+            <tbody id="ageing-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<footer>Accenture Products &amp; Platforms &nbsp;|&nbsp; HC Report: 17 Sep 2026</footer>
+<footer>Accenture Products &amp; Platforms &nbsp;|&nbsp; HC: 17 Sep 2026 &nbsp;|&nbsp; Demands: 08 Sep 2026</footer>
 
 <script>
 // =================== DATA ===================
+const DEMAND_DATA = [
+{'rrd':'R5772260','status':'Open - In Process','du':'APP-ASCENTIA-PE','level':'8','levelLabel':'AM','skill':'Amazon Web Services (AWS)','location':'Chennai','project':'ACAN-PE','createDate':'07-Sep-2026','expDate':'12-Oct-2026','ageing':'<90','ageDays':292,'pending':1},
+{'rrd':'R5771372','status':'Open - In Process','du':'APP-D&AI-PE','level':'10','levelLabel':'ASE','skill':'Microsoft Azure AI foundry','location':'Pune','project':'M-Nav_Marketing Investment Navigator','createDate':'07-Sep-2026','expDate':'27-Nov-2026','ageing':'<90','ageDays':765,'pending':1},
+{'rrd':'R5771208','status':'Open - In Process','du':'APP-RAI-PE','level':'10','levelLabel':'ASE','skill':'Data Science','location':'Gurugram','project':'R-AI-Core','createDate':'07-Sep-2026','expDate':'08-Sep-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5771207','status':'Open - In Process','du':'APP-RAI-PE','level':'9','levelLabel':'TL','skill':'Data Engineering','location':'Gurugram','project':'R-AI-Core','createDate':'07-Sep-2026','expDate':'08-Sep-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5770672','status':'Open - In Process','du':'APP-RAI-PE','level':'7','levelLabel':'M','skill':'User Experience (UX) Design','location':'Bengaluru','project':'R-AI-Core','createDate':'04-Sep-2026','expDate':'01-Dec-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5770615','status':'Open - In Process','du':'APP-RAI-PE','level':'7','levelLabel':'M','skill':'Oracle Cloud Infrastructure Architecture','location':'Chennai','project':'R-AI-Core','createDate':'04-Sep-2026','expDate':'01-Dec-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5770363','status':'Open - In Process','du':'APP-RAI-PE','level':'8','levelLabel':'AM','skill':'Oracle Cloud Infrastructure Architecture','location':'Chennai','project':'R-AI-Core','createDate':'04-Sep-2026','expDate':'01-Dec-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5770043','status':'Open - In Process','du':'APP-NP-PS','level':'7','levelLabel':'M','skill':'Accenture NewsPage DMS/SFA Functional','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'04-Sep-2026','expDate':'14-Dec-2026','ageing':'<90','ageDays':382,'pending':1},
+{'rrd':'R5768571','status':'Open - In Process','du':'APP-NP-PE','level':'9','levelLabel':'TL','skill':'Microsoft SQL Server Integration Services (SSIS)','location':'Bengaluru','project':'APP Newspage Engineering Service','createDate':'03-Sep-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':61,'pending':1},
+{'rrd':'R5767992','status':'Open - In Process','du':'APP-NP-PE','level':'9','levelLabel':'TL','skill':'Machine Learning (ML)','location':'Bengaluru','project':'APP Newspage Engineering Service','createDate':'02-Sep-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':61,'pending':1},
+{'rrd':'R5767954','status':'Open - In Process','du':'APP-NP-PE','level':'9','levelLabel':'TL','skill':'Node.js','location':'Bengaluru','project':'APP Newspage Engineering Service','createDate':'02-Sep-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':61,'pending':1},
+{'rrd':'R5767883','status':'Open - In Process','du':'APP-NP-PS','level':'11','levelLabel':'SE','skill':'Node.js','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'02-Sep-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':61,'pending':1},
+{'rrd':'R5767882','status':'Open - In Process','du':'APP-NP-PS','level':'11','levelLabel':'SE','skill':'Node.js','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'02-Sep-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':61,'pending':1},
+{'rrd':'R5767728','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'Multiplatform Front End Development Angular','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'02-Sep-2026','expDate':'30-Oct-2026','ageing':'<90','ageDays':62,'pending':1},
+{'rrd':'R5767727','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'Multiplatform Front End Development Angular','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'02-Sep-2026','expDate':'30-Oct-2026','ageing':'<90','ageDays':62,'pending':1},
+{'rrd':'R5767726','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'Multiplatform Front End Development Angular','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'02-Sep-2026','expDate':'30-Oct-2026','ageing':'<90','ageDays':62,'pending':1},
+{'rrd':'R5767632','status':'Open - In Process','du':'APP-LS-INTIENT-PE','level':'8','levelLabel':'AM','skill':'Automated Testing','location':'Hyderabad','project':'INTIENT_Unify','createDate':'02-Sep-2026','expDate':'23-Nov-2026','ageing':'<90','ageDays':128,'pending':1},
+{'rrd':'R5767566','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'Node.js','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'02-Sep-2026','expDate':'30-Oct-2026','ageing':'<90','ageDays':62,'pending':1},
+{'rrd':'R5767565','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'Node.js','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'02-Sep-2026','expDate':'30-Oct-2026','ageing':'<90','ageDays':62,'pending':1},
+{'rrd':'R5767564','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'Node.js','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'02-Sep-2026','expDate':'30-Oct-2026','ageing':'<90','ageDays':62,'pending':1},
+{'rrd':'R5766508','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'JavaScript','location':'Hyderabad','project':'AVS PS - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766497','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'JavaScript','location':'Hyderabad','project':'AVS PS - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766459','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'JavaScript','location':'Hyderabad','project':'AVS PS - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766458','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'JavaScript','location':'Hyderabad','project':'AVS PS - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766455','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'JavaScript','location':'Hyderabad','project':'AVS PS - LT','createDate':'02-Sep-2026','expDate':'01-Dec-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5766454','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'JavaScript','location':'Hyderabad','project':'AVS PS - LT','createDate':'02-Sep-2026','expDate':'01-Dec-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5766348','status':'Open - In Process','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Spring Boot','location':'Hyderabad','project':'AVS PE - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766347','status':'Open - In Process','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Spring Boot','location':'Hyderabad','project':'AVS PE - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766346','status':'Open - In Process','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Spring Boot','location':'Hyderabad','project':'AVS PE - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766345','status':'Open - In Process','du':'APP-AVS-PE','level':'10','levelLabel':'ASE','skill':'Spring Boot','location':'Hyderabad','project':'AVS PE - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766344','status':'Open - In Process','du':'APP-AVS-PE','level':'11','levelLabel':'SE','skill':'Spring Boot','location':'Hyderabad','project':'AVS PE - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5766343','status':'Open - In Process','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Spring Boot','location':'Hyderabad','project':'AVS PE - LT','createDate':'02-Sep-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5762791','status':'Open - In Process','du':'APP Biz Enablement','level':'12','levelLabel':'SSE','skill':'Program Control Services','location':'Bengaluru','project':'ASW Business Enablement','createDate':'31-Aug-2026','expDate':'01-Sep-2026','ageing':'<90','ageDays':852,'pending':1},
+{'rrd':'R5749612','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'Multiplatform Front End Development Angular','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'27-Aug-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':92,'pending':1},
+{'rrd':'R5749611','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'Multiplatform Front End Development Angular','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'27-Aug-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':92,'pending':1},
+{'rrd':'R5749513','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749512','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749504','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749503','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749474','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749451','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':426,'pending':1},
+{'rrd':'R5749450','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':426,'pending':1},
+{'rrd':'R5749449','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':426,'pending':1},
+{'rrd':'R5749439','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5749438','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'AWS Architecture','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5749413','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749412','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749388','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749387','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749386','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749374','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749373','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749372','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749352','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749351','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Kubernetes','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5749341','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Elastic Stack (ELK)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Nov-2026','ageing':'<90','ageDays':425,'pending':1},
+{'rrd':'R5749340','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Elastic Stack (ELK)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Nov-2026','ageing':'<90','ageDays':425,'pending':1},
+{'rrd':'R5749339','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Elastic Stack (ELK)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Nov-2026','ageing':'<90','ageDays':425,'pending':1},
+{'rrd':'R5749338','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Elastic Stack (ELK)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Nov-2026','ageing':'<90','ageDays':425,'pending':1},
+{'rrd':'R5749337','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Elastic Stack (ELK)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Nov-2026','ageing':'<90','ageDays':425,'pending':1},
+{'rrd':'R5749316','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'PHP (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749315','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'PHP (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749314','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'PHP (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749313','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'PHP (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749312','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'PHP (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749208','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Rust (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749207','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Rust (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749206','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Rust (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749205','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Rust (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749204','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Rust (Programming Language)','location':'Hyderabad','project':'AVS PS - LT','createDate':'27-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749202','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749201','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749200','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749197','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749196','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749195','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749194','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749182','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749181','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749180','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749179','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749146','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749145','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749144','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749143','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Node.js','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749101','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749100','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749099','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749098','status':'Open - In Process','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749096','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749095','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749094','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749093','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5749092','status':'Open - In Process','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748843','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748842','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748841','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748840','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748839','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748838','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748837','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748836','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748835','status':'Open - In Process','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Go Programming Language','location':'Hyderabad','project':'AVS PS - LT','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5748371','status':'Open - In Process','du':'APP-RAI-PE','level':'9','levelLabel':'TL','skill':'Selenium','location':'Bengaluru','project':'R-AI-Core','createDate':'26-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5745278','status':'Open - In Process','du':'APP-D&AI-PE','level':'10','levelLabel':'ASE','skill':'Microsoft Azure DevOps','location':'Gurugram','project':'AP-Eng-PE','createDate':'24-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5744570','status':'Open - In Process','du':'APTP','level':'7','levelLabel':'M','skill':'Google Cloud Data Services','location':'Bengaluru','project':'ATOM AMIGA HSBC','createDate':'21-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':1856,'pending':1},
+{'rrd':'R5742787','status':'Open - In Process','du':'APP-D&AI-PE','level':'9','levelLabel':'TL','skill':'Automated Testing','location':'Pune','project':'AP-Eng-PE','createDate':'20-Aug-2026','expDate':'29-Oct-2026','ageing':'<90','ageDays':428,'pending':1},
+{'rrd':'R5730753','status':'Open - Need Project Feedback','du':'APP-NP-PS','level':'10','levelLabel':'ASE','skill':'User Experience (UX) Design','location':'Ahmedabad','project':'APP Newspage Client Services','createDate':'19-Aug-2026','expDate':'20-Aug-2026','ageing':'<90','ageDays':486,'pending':1},
+{'rrd':'R5730260','status':'Open - In Process','du':'APP-AVS-PE','level':'7','levelLabel':'M','skill':'Accenture Digital Video Solutions','location':'Chennai','project':'AVS PE - LT','createDate':'19-Aug-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':426,'pending':1},
+{'rrd':'R5730254','status':'Open - In Process','du':'APP-AVS-PE','level':'10','levelLabel':'ASE','skill':'Node.js','location':'Hyderabad','project':'AVS PE - LT','createDate':'19-Aug-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5725127','status':'Open - In Process','du':'APP-RAI-PE','level':'8','levelLabel':'AM','skill':'Database Architecture','location':'Bengaluru','project':'R-AI-Core','createDate':'13-Aug-2026','expDate':'01-Nov-2026','ageing':'<90','ageDays':425,'pending':1},
+{'rrd':'R5725119','status':'Open - In Process','du':'APP-RAI-PE','level':'7','levelLabel':'M','skill':'Database Architecture','location':'Bengaluru','project':'R-AI-Core','createDate':'13-Aug-2026','expDate':'01-Nov-2026','ageing':'<90','ageDays':425,'pending':1},
+{'rrd':'R5722263','status':'Open - In Process','du':'APP-RAI-PE','level':'7','levelLabel':'M','skill':'DevOps','location':'Hyderabad','project':'R-AI-FDE','createDate':'12-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':181,'pending':1},
+{'rrd':'R5722159','status':'Open - In Process','du':'APP-NP-PS','level':'12','levelLabel':'SSE','skill':'ASP.NET MVC','location':'Bengaluru','project':'APP_NP_PEPSI_FACTORY','createDate':'12-Aug-2026','expDate':'13-Aug-2026','ageing':'<90','ageDays':486,'pending':1},
+{'rrd':'R5721072','status':'Filled - Pending Joiner','du':'APP-NP-PS','level':'10','levelLabel':'ASE','skill':'Accenture NewsPage DMS/SFA Functional','location':'Hyderabad','project':'APP_NP_PEPSI_FACTORY','createDate':'11-Aug-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':426,'pending':0},
+{'rrd':'R5719680','status':'Open - In Process','du':'APP-LS-INTIENT-PS','level':'11','levelLabel':'SE','skill':'Google Cloud Platform (GCP)','location':'Bengaluru','project':'INT_CL_IMP_Novo_AO','createDate':'10-Aug-2026','expDate':'16-Nov-2026','ageing':'<90','ageDays':135,'pending':1},
+{'rrd':'R5719169','status':'Open - In Process','du':'APP-LS-INTIENT-PE','level':'9','levelLabel':'TL','skill':'JavaScript','location':'Bengaluru','project':'INTIENT_Clinical','createDate':'10-Aug-2026','expDate':'02-Nov-2026','ageing':'<90','ageDays':149,'pending':1},
+{'rrd':'R5713863','status':'Open - In Process','du':'APP-NP-PS','level':'10','levelLabel':'ASE','skill':'Accenture NewsPage DMS/SFA Technical','location':'Bengaluru','project':'Nestle Newspage','createDate':'06-Aug-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5713862','status':'Open - In Process','du':'APP-NP-PS','level':'10','levelLabel':'ASE','skill':'Accenture NewsPage DMS/SFA Technical','location':'Bengaluru','project':'Nestle Newspage','createDate':'06-Aug-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5713856','status':'Open - In Process','du':'APP-NP-PS','level':'9','levelLabel':'TL','skill':'Accenture NewsPage DMS/SFA Technical','location':'Bengaluru','project':'Nestle Newspage','createDate':'06-Aug-2026','expDate':'30-Nov-2026','ageing':'<90','ageDays':396,'pending':1},
+{'rrd':'R5713543','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'AWS Architecture','location':'Bengaluru','project':'AVS PE - LT','createDate':'06-Aug-2026','expDate':'31-Dec-2026','ageing':'<90','ageDays':151,'pending':1},
+{'rrd':'R5710786','status':'Open - Need Project Feedback','du':'APP-NP-PS','level':'11','levelLabel':'SE','skill':'Microsoft ASP.NET','location':'Bengaluru','project':'APP_NP_PEPSI_FACTORY','createDate':'04-Aug-2026','expDate':'01-Oct-2026','ageing':'<90','ageDays':456,'pending':1},
+{'rrd':'R5709168','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'DevOps','location':'Hyderabad','project':'Project Thasos','createDate':'03-Aug-2026','expDate':'28-Oct-2026','ageing':'<90','ageDays':95,'pending':1},
+{'rrd':'R5708686','status':'Open - In Process','du':'APP-LS-INTIENT-PE','level':'9','levelLabel':'TL','skill':'Data Science','location':'Bengaluru','project':'Harmoni','createDate':'31-Jul-2026','expDate':'20-Nov-2026','ageing':'<90','ageDays':131,'pending':1},
+{'rrd':'R5703414','status':'Open - In Process','du':'APP-AVS-PE','level':'10','levelLabel':'ASE','skill':'Automated Testing','location':'Hyderabad','project':'AVS OTTV','createDate':'28-Jul-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':273,'pending':1},
+{'rrd':'R5698967','status':'Open - Need Project Feedback','du':'APP-NP-PE','level':'8','levelLabel':'AM','skill':'Microsoft Azure DevOps','location':'Bengaluru','project':'APP Newspage Engineering Service','createDate':'24-Jul-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5698945','status':'Open - Need Project Feedback','du':'APP-NP-PE','level':'8','levelLabel':'AM','skill':'React Native','location':'Bengaluru','project':'APP Newspage Engineering Service','createDate':'24-Jul-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5698943','status':'Open - Need Project Feedback','du':'APP-NP-PE','level':'7','levelLabel':'M','skill':'Node.js','location':'Bengaluru','project':'APP Newspage Engineering Service','createDate':'24-Jul-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5698234','status':'Open - In Process','du':'APP-NP-PS','level':'9','levelLabel':'TL','skill':'Marketing Analytics and Reporting','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'23-Jul-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5693016','status':'Open - In Process','du':'APP-ASCENTIA-PE','level':'7','levelLabel':'M','skill':'Software Product Management','location':'Bengaluru','project':'ACAN-PM','createDate':'21-Jul-2026','expDate':'30-Sep-2026','ageing':'<90','ageDays':457,'pending':1},
+{'rrd':'R5688301','status':'Open - In Process','du':'APTP','level':'10','levelLabel':'ASE','skill':'Investment Banking','location':'Bengaluru','project':'ATOM ING','createDate':'16-Jul-2026','expDate':'01-Sep-2026','ageing':'<90','ageDays':455,'pending':1},
+{'rrd':'R5688051','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM BANKDATA','createDate':'16-Jul-2026','expDate':'01-Dec-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5688050','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM BANKDATA','createDate':'16-Jul-2026','expDate':'01-Sep-2026','ageing':'<90','ageDays':486,'pending':1},
+{'rrd':'R5688049','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM BANKDATA','createDate':'16-Jul-2026','expDate':'01-Sep-2026','ageing':'<90','ageDays':486,'pending':1},
+{'rrd':'R5688048','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM BANKDATA','createDate':'16-Jul-2026','expDate':'01-Sep-2026','ageing':'<90','ageDays':486,'pending':1},
+{'rrd':'R5688047','status':'Open - Need Project Feedback','du':'APTP','level':'9','levelLabel':'TL','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM BANKDATA','createDate':'16-Jul-2026','expDate':'01-Sep-2026','ageing':'<90','ageDays':486,'pending':1},
+{'rrd':'R5685942','status':'Open - In Process','du':'APP-NP-PS','level':'10','levelLabel':'ASE','skill':'Python (Programming Language)','location':'Chennai','project':'APP Newspage Client Services','createDate':'15-Jul-2026','expDate':'07-Aug-2026','ageing':'<90','ageDays':486,'pending':1},
+{'rrd':'R5683233','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'DevOps','location':'Bengaluru','project':'Proximus TV Services Sourcing','createDate':'13-Jul-2026','expDate':'31-Jan-2027','ageing':'<90','ageDays':120,'pending':1},
+{'rrd':'R5683232','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'DevOps','location':'Bengaluru','project':'Proximus TV Services Sourcing','createDate':'13-Jul-2026','expDate':'31-Dec-2026','ageing':'<90','ageDays':31,'pending':1},
+{'rrd':'R5683162','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'DevOps','location':'Bengaluru','project':'Proximus TV Services Sourcing','createDate':'13-Jul-2026','expDate':'31-Dec-2026','ageing':'<90','ageDays':151,'pending':1},
+{'rrd':'R5672324','status':'Open - Need Project Feedback','du':'APP-NP-PS','level':'8','levelLabel':'AM','skill':'Node.js','location':'Bengaluru','project':'APP Newspage Client Services','createDate':'03-Jul-2026','expDate':'01-Sep-2026','ageing':'<90','ageDays':486,'pending':1},
+{'rrd':'R5670135','status':'Open - Need Project Feedback','du':'APP-LS-INTIENT-PE','level':'8','levelLabel':'AM','skill':'Python (Programming Language)','location':'Bengaluru','project':'Harmoni','createDate':'02-Jul-2026','expDate':'22-Oct-2026','ageing':'<90','ageDays':70,'pending':1},
+{'rrd':'R5664807','status':'Open - Need Project Feedback','du':'APP-NP-PS','level':'10','levelLabel':'ASE','skill':'Node.js','location':'Bengaluru','project':'Nestle Newspage','createDate':'29-Jun-2026','expDate':'31-Oct-2026','ageing':'<90','ageDays':426,'pending':1},
+{'rrd':'R5641978','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'DevOps','location':'Bengaluru','project':'ATOM ING','createDate':'25-Jun-2026','expDate':'01-Aug-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5641965','status':'Open - In Process','du':'APTP','level':'10','levelLabel':'ASE','skill':'Microsoft Robotic Process Automation Advanced','location':'Bengaluru','project':'ATOM ING','createDate':'25-Jun-2026','expDate':'01-Dec-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5641964','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Microsoft Robotic Process Automation Advanced','location':'Bengaluru','project':'ATOM ING','createDate':'25-Jun-2026','expDate':'01-Dec-2026','ageing':'<90','ageDays':395,'pending':1},
+{'rrd':'R5641938','status':'Open - In Process','du':'APTP','level':'7','levelLabel':'M','skill':'AWS Database Migration Service (DMS)','location':'Pune','project':'ATOM ING','createDate':'25-Jun-2026','expDate':'01-Nov-2026','ageing':'<90','ageDays':394,'pending':1},
+{'rrd':'R5629074','status':'Filled - Pending Joiner','du':'APTP','level':'7','levelLabel':'M','skill':'Investment Banking','location':'Mumbai','project':'CRIMS-Migration factory','createDate':'15-Jun-2026','expDate':'01-Aug-2026','ageing':'<90','ageDays':486,'pending':0},
+{'rrd':'R5594119','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AI Agents & Workflow Integration','location':'Hyderabad','project':'AVS PS','createDate':'21-May-2026','expDate':'31-Dec-2026','ageing':'90-179','ageDays':243,'pending':1},
+{'rrd':'R5594118','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AI Agents & Workflow Integration','location':'Hyderabad','project':'AVS PS','createDate':'21-May-2026','expDate':'31-Jan-2027','ageing':'90-179','ageDays':212,'pending':1},
+{'rrd':'R5594117','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AI Agents & Workflow Integration','location':'Hyderabad','project':'AVS PS','createDate':'21-May-2026','expDate':'31-Jan-2027','ageing':'90-179','ageDays':212,'pending':1},
+{'rrd':'R5594116','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AI Agents & Workflow Integration','location':'Hyderabad','project':'AVS PS','createDate':'21-May-2026','expDate':'31-Jan-2027','ageing':'90-179','ageDays':212,'pending':1},
+{'rrd':'R5594115','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AI Agents & Workflow Integration','location':'Hyderabad','project':'AVS PS','createDate':'21-May-2026','expDate':'31-Jan-2027','ageing':'90-179','ageDays':212,'pending':1},
+{'rrd':'R5594114','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AI Agents & Workflow Integration','location':'Hyderabad','project':'AVS PS','createDate':'21-May-2026','expDate':'30-Nov-2026','ageing':'90-179','ageDays':274,'pending':1},
+{'rrd':'R5554554','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'AWS Architecture','location':'Hyderabad','project':'Project Thasos','createDate':'05-May-2026','expDate':'25-Dec-2026','ageing':'90-179','ageDays':65,'pending':1},
+{'rrd':'R5549007','status':'Open - In Process','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Accenture Digital Video Solutions','location':'Nagpur','project':'AVS PE - LT','createDate':'29-Apr-2026','expDate':'26-Dec-2026','ageing':'90-179','ageDays':36,'pending':1},
+{'rrd':'R5539730','status':'Filled - Pending Joiner','du':'APTP','level':'8','levelLabel':'AM','skill':'Mainframe Application Performance Optimization','location':'Bengaluru','project':'ATOM ING','createDate':'21-Apr-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':0},
+{'rrd':'R5539728','status':'Filled - Pending Joiner','du':'APTP','level':'8','levelLabel':'AM','skill':'Mainframe Application Performance Optimization','location':'Pune','project':'ATOM ING','createDate':'21-Apr-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':0},
+{'rrd':'R5539487','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Microsoft SQL Server','location':'Pune','project':'ATOM ING','createDate':'21-Apr-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5539485','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Oracle Procedural Language Extensions to SQL (PLSQL)','location':'Pune','project':'ATOM ING','createDate':'21-Apr-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5539484','status':'Open - Need Project Feedback','du':'APTP','level':'7','levelLabel':'M','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'21-Apr-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5539482','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Functional Test Planning','location':'Pune','project':'ATOM ING','createDate':'21-Apr-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5539479','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Functional Test Planning','location':'Pune','project':'ATOM ING','createDate':'21-Apr-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5539478','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Functional Test Planning','location':'Pune','project':'ATOM ING','createDate':'21-Apr-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5523833','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'11','levelLabel':'SE','skill':'DevOps','location':'Hyderabad','project':'Project Thasos','createDate':'08-Apr-2026','expDate':'30-Sep-2026','ageing':'90-179','ageDays':212,'pending':1},
+{'rrd':'R5523037','status':'Open - Need Project Feedback','du':'APP-ASCENTIA-PE','level':'9','levelLabel':'TL','skill':'React.js','location':'Bengaluru','project':'ACAN-PE','createDate':'07-Apr-2026','expDate':'31-Aug-2026','ageing':'90-179','ageDays':122,'pending':1},
+{'rrd':'R5499317','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5499316','status':'Open - Need Project Feedback','du':'APTP','level':'8','levelLabel':'AM','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Sep-2026','ageing':'90-179','ageDays':486,'pending':1},
+{'rrd':'R5499314','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5499312','status':'Open - Need Project Feedback','du':'APTP','level':'9','levelLabel':'TL','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Oct-2026','ageing':'90-179','ageDays':456,'pending':1},
+{'rrd':'R5499025','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5499019','status':'Open - Need Project Feedback','du':'APTP','level':'9','levelLabel':'TL','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Dec-2026','ageing':'90-179','ageDays':395,'pending':1},
+{'rrd':'R5499017','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5499016','status':'Open - Need Project Feedback','du':'APTP','level':'9','levelLabel':'TL','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5499015','status':'Open - Need Project Feedback','du':'APTP','level':'7','levelLabel':'M','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5499014','status':'Open - Need Project Feedback','du':'APTP','level':'9','levelLabel':'TL','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5499008','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Java Standard Edition','location':'Bengaluru','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Jan-2027','ageing':'90-179','ageDays':364,'pending':1},
+{'rrd':'R5499007','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5499006','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Java Standard Edition','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5498845','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Functional Test Planning','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5498843','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Performance Testing Strategy','location':'Bengaluru','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Oct-2026','ageing':'90-179','ageDays':456,'pending':1},
+{'rrd':'R5498831','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'Functional Test Planning','location':'Bengaluru','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5498829','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Functional Test Planning','location':'Pune','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Nov-2026','ageing':'90-179','ageDays':425,'pending':1},
+{'rrd':'R5498813','status':'Open - Need Project Feedback','du':'APTP','level':'11','levelLabel':'SE','skill':'Functional Test Planning','location':'Bengaluru','project':'ATOM ING','createDate':'20-Mar-2026','expDate':'01-Dec-2026','ageing':'90-179','ageDays':395,'pending':1},
+{'rrd':'R5486641','status':'Open - In Process','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'AWS CloudFormation','location':'Hyderabad','project':'Formula 1 AVS OTT','createDate':'11-Mar-2026','expDate':'30-Sep-2026','ageing':'180-364','ageDays':151,'pending':1},
+{'rrd':'R5470139','status':'Open - In Process','du':'APP-LS-INTIENT-PE','level':'7','levelLabel':'M','skill':'Python (Programming Language)','location':'Bengaluru','project':'Harmoni','createDate':'27-Feb-2026','expDate':'21-Aug-2026','ageing':'180-364','ageDays':318,'pending':1},
+{'rrd':'R5453353','status':'Open - Need Project Feedback','du':'APP-D&AI-PE','level':'5','levelLabel':'AD','skill':'Software Product Management','location':'Bengaluru','project':'NEU-Reinvent-PE','createDate':'19-Feb-2026','expDate':'31-Oct-2026','ageing':'180-364','ageDays':701,'pending':1},
+{'rrd':'R5451703','status':'Open - In Process','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'AI Agents & Workflow Integration','location':'Hyderabad','project':'AVS OTTV','createDate':'18-Feb-2026','expDate':'30-Sep-2026','ageing':'180-364','ageDays':243,'pending':1},
+{'rrd':'R5451702','status':'Open - In Process','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'AI Agents & Workflow Integration','location':'Hyderabad','project':'AVS OTTV','createDate':'18-Feb-2026','expDate':'30-Sep-2026','ageing':'180-364','ageDays':396,'pending':1},
+{'rrd':'R5451622','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Generative AI','location':'Hyderabad','project':'AVS OTTV','createDate':'18-Feb-2026','expDate':'26-Dec-2026','ageing':'180-364','ageDays':5,'pending':1},
+{'rrd':'R5451621','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Generative AI','location':'Hyderabad','project':'AVS OTTV','createDate':'18-Feb-2026','expDate':'26-Dec-2026','ageing':'180-364','ageDays':5,'pending':1},
+{'rrd':'R5451251','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Prompt Engineering','location':'Hyderabad','project':'AVS OTTV','createDate':'18-Feb-2026','expDate':'31-Oct-2026','ageing':'180-364','ageDays':61,'pending':1},
+{'rrd':'R5450699','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'AWS Administration','location':'Bengaluru','project':'ATOM BANKDATA','createDate':'18-Feb-2026','expDate':'01-Sep-2026','ageing':'180-364','ageDays':486,'pending':1},
+{'rrd':'R5431353','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'8','levelLabel':'AM','skill':'Node.js','location':'Chennai','project':'Project Thasos','createDate':'09-Feb-2026','expDate':'31-Oct-2026','ageing':'180-364','ageDays':61,'pending':1},
+{'rrd':'R5431341','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Node.js','location':'Hyderabad','project':'Project Thasos','createDate':'09-Feb-2026','expDate':'31-Jan-2027','ageing':'180-364','ageDays':242,'pending':1},
+{'rrd':'R5427997','status':'Open - Need Project Feedback','du':'APP-ALV-PE','level':'12','levelLabel':'SSE','skill':'Functional Test Planning','location':'Bengaluru','project':'APP-ALV-Udacity','createDate':'06-Feb-2026','expDate':'06-Apr-2026','ageing':'180-364','ageDays':238,'pending':1},
+{'rrd':'R5400979','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'12','levelLabel':'SSE','skill':'Java Standard Edition','location':'Hyderabad','project':'AVS OTTV','createDate':'28-Jan-2026','expDate':'31-Oct-2026','ageing':'180-364','ageDays':61,'pending':1},
+{'rrd':'R5396463','status':'Open - In Process','du':'APP-LS-INTIENT-PE','level':'10','levelLabel':'ASE','skill':'Graph Databases','location':'Bengaluru','project':'Harmoni','createDate':'23-Jan-2026','expDate':'01-May-2026','ageing':'180-364','ageDays':244,'pending':1},
+{'rrd':'R5395923','status':'Open - In Process','du':'APP-LS-INTIENT-PE','level':'8','levelLabel':'AM','skill':'Graph Databases','location':'Bengaluru','project':'Harmoni','createDate':'22-Jan-2026','expDate':'30-Apr-2026','ageing':'180-364','ageDays':276,'pending':1},
+{'rrd':'R5395919','status':'Open - In Process','du':'APP-LS-INTIENT-PE','level':'9','levelLabel':'TL','skill':'Graph Databases','location':'Bengaluru','project':'Harmoni','createDate':'22-Jan-2026','expDate':'30-Apr-2026','ageing':'180-364','ageDays':276,'pending':1},
+{'rrd':'R5392535','status':'Filled - Pending Joiner','du':'APP-ASCG-OP-PS','level':'10','levelLabel':'ASE','skill':'Trade Promotions Management','location':'Coimbatore','project':'Mars Salsify PV VF AO','createDate':'21-Jan-2026','expDate':'28-Aug-2026','ageing':'180-364','ageDays':519,'pending':0},
+{'rrd':'R5311665','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'10','levelLabel':'ASE','skill':'Test Automation Strategy','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311661','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311660','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311659','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Spring Boot','location':'Bengaluru','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311658','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311656','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'25-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311655','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311651','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'30-Sep-2026','ageing':'180-364','ageDays':92,'pending':1},
+{'rrd':'R5311650','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311649','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311648','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':153,'pending':1},
+{'rrd':'R5311647','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'8','levelLabel':'AM','skill':'Spring Boot','location':'Hyderabad','project':'AVS OTTV','createDate':'01-Dec-2025','expDate':'31-Jul-2026','ageing':'180-364','ageDays':184,'pending':1},
+{'rrd':'R5229903','status':'Open - Need Project Feedback','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'Spring Boot','location':'Bengaluru','project':'ASW Business Enablement','createDate':'28-Oct-2025','expDate':'30-Nov-2026','ageing':'180-364','ageDays':212,'pending':1},
+{'rrd':'R5229901','status':'Open - Need Project Feedback','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'Spring Boot','location':'Bengaluru','project':'ASW Business Enablement','createDate':'28-Oct-2025','expDate':'30-Nov-2026','ageing':'180-364','ageDays':212,'pending':1},
+{'rrd':'R5229332','status':'Open - Need Project Feedback','du':'APP Biz Enablement','level':'9','levelLabel':'TL','skill':'Java Full Stack Development','location':'Bengaluru','project':'ASW Business Enablement','createDate':'28-Oct-2025','expDate':'30-Nov-2026','ageing':'180-364','ageDays':212,'pending':1},
+{'rrd':'R5229330','status':'Open - Need Project Feedback','du':'APP Biz Enablement','level':'9','levelLabel':'TL','skill':'Java Full Stack Development','location':'Bengaluru','project':'ASW Business Enablement','createDate':'28-Oct-2025','expDate':'30-Nov-2026','ageing':'180-364','ageDays':212,'pending':1},
+{'rrd':'R5229329','status':'Open - Need Project Feedback','du':'APP Biz Enablement','level':'9','levelLabel':'TL','skill':'Java Full Stack Development','location':'Bengaluru','project':'ASW Business Enablement','createDate':'28-Oct-2025','expDate':'30-Nov-2026','ageing':'180-364','ageDays':212,'pending':1},
+{'rrd':'R5228002','status':'Open - Need Project Feedback','du':'APP-LS-INTIENT-PE','level':'9','levelLabel':'TL','skill':'PySpark','location':'Chennai','project':'Harmoni','createDate':'27-Oct-2025','expDate':'10-Jul-2026','ageing':'180-364','ageDays':456,'pending':1},
+{'rrd':'R5201977','status':'Filled - Pending Joiner','du':'APP-AVS-PE','level':'11','levelLabel':'SE','skill':'Java (Programming Language)','location':'Hyderabad','project':'AVS OTTV','createDate':'28-Sep-2025','expDate':'02-Sep-2026','ageing':'180-364','ageDays':447,'pending':0},
+{'rrd':'R5101926','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'7','levelLabel':'M','skill':'Large Language Models (LLMs)','location':'Kolkata','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'30-Nov-2026','ageing':'365+','ageDays':334,'pending':0},
+{'rrd':'R5101753','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'User Experience (UX) Design','location':'Bengaluru','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'31-Dec-2025','ageing':'365+','ageDays':433,'pending':0},
+{'rrd':'R5101020','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'Automated Testing','location':'Bengaluru','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'16-Jul-2026','ageing':'365+','ageDays':463,'pending':0},
+{'rrd':'R5101015','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'Automated Testing','location':'Hyderabad','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'30-Nov-2026','ageing':'365+','ageDays':304,'pending':0},
+{'rrd':'R5100977','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'React Native','location':'Noida','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'31-Dec-2025','ageing':'365+','ageDays':423,'pending':0},
+{'rrd':'R5100915','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'React.js','location':'Bengaluru','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'19-Jun-2026','ageing':'365+','ageDays':438,'pending':0},
+{'rrd':'R5100833','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'Spring Boot','location':'Bengaluru','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'31-Dec-2025','ageing':'365+','ageDays':412,'pending':0},
+{'rrd':'R5100831','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'Spring Boot','location':'Kolkata','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'13-Dec-2025','ageing':'365+','ageDays':656,'pending':0},
+{'rrd':'R5100827','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'10','levelLabel':'ASE','skill':'Spring Boot','location':'Kolkata','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'31-Dec-2025','ageing':'365+','ageDays':377,'pending':0},
+{'rrd':'R5100673','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'7','levelLabel':'M','skill':'Java Full Stack Development','location':'Hyderabad','project':'ASW Business Enablement','createDate':'12-Aug-2025','expDate':'30-Nov-2026','ageing':'365+','ageDays':341,'pending':0},
+{'rrd':'R5100601','status':'Open - Need Project Feedback','du':'APP-ASCENTIA-PE','level':'6','levelLabel':'SM','skill':'Software Product Management','location':'Bengaluru','project':'ACAN-PM','createDate':'12-Aug-2025','expDate':'30-Nov-2026','ageing':'365+','ageDays':212,'pending':1},
+{'rrd':'R5100460','status':'Filled - Pending Joiner','du':'APP Biz Enablement','level':'9','levelLabel':'TL','skill':'Application Security Architecture and Design','location':'Gurugram','project':'ASW Business Enablement','createDate':'11-Aug-2025','expDate':'30-Nov-2026','ageing':'365+','ageDays':318,'pending':0},
+{'rrd':'R5062146','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Node.js','location':'Hyderabad','project':'Formula 1 AVS OTT','createDate':'10-Jul-2025','expDate':'26-Dec-2026','ageing':'365+','ageDays':5,'pending':1},
+{'rrd':'R5060530','status':'Filled - Pending Joiner','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'Node.js','location':'Coimbatore','project':'Formula 1 AVS OTT','createDate':'09-Jul-2025','expDate':'30-Sep-2026','ageing':'365+','ageDays':384,'pending':0},
+{'rrd':'R5055053','status':'Open - Need Project Feedback','du':'APP Biz Enablement','level':'5','levelLabel':'AD','skill':'Software Product Management','location':'Bengaluru','project':'ASW Business Enablement','createDate':'03-Jul-2025','expDate':'28-Aug-2026','ageing':'365+','ageDays':93,'pending':1},
+{'rrd':'R5045085','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'10','levelLabel':'ASE','skill':'JavaScript','location':'Hyderabad','project':'Formula 1 AVS OTT','createDate':'25-Jun-2025','expDate':'31-Dec-2026','ageing':'365+','ageDays':334,'pending':1},
+{'rrd':'R5045020','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'JavaScript','location':'Hyderabad','project':'Formula 1 AVS OTT','createDate':'25-Jun-2025','expDate':'30-Sep-2026','ageing':'365+','ageDays':273,'pending':1},
+{'rrd':'R5041691','status':'Open - Need Project Feedback','du':'APP-CFP','level':'7','levelLabel':'M','skill':'Software Product Management','location':'Bengaluru','project':'CoE Product Management','createDate':'23-Jun-2025','expDate':'01-Jun-2026','ageing':'365+','ageDays':122,'pending':1},
+{'rrd':'R5029875','status':'Open - In Process','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Java (Programming Language)','location':'Hyderabad','project':'AVS OTTV','createDate':'20-Jun-2025','expDate':'31-Jul-2026','ageing':'365+','ageDays':184,'pending':1},
+{'rrd':'R5028072','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Node.js','location':'Hyderabad','project':'AVS OTTV','createDate':'19-Jun-2025','expDate':'26-Dec-2026','ageing':'365+','ageDays':257,'pending':1},
+{'rrd':'R5028063','status':'Open - In Process','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Java (Programming Language)','location':'Hyderabad','project':'AVS OTTV','createDate':'19-Jun-2025','expDate':'31-Jan-2027','ageing':'365+','ageDays':334,'pending':1},
+{'rrd':'R5028052','status':'Open - Need Project Feedback','du':'APP-AVS-PE','level':'9','levelLabel':'TL','skill':'Red Hat OpenShift','location':'Hyderabad','project':'AVS OTTV','createDate':'19-Jun-2025','expDate':'31-Jul-2026','ageing':'365+','ageDays':184,'pending':1},
+{'rrd':'R5027777','status':'Open - Need Project Feedback','du':'APTP','level':'10','levelLabel':'ASE','skill':'DevOps','location':'Coimbatore','project':'ATOM Barclays','createDate':'18-Jun-2025','expDate':'01-Apr-2026','ageing':'365+','ageDays':332,'pending':1},
+{'rrd':'R4994030','status':'Open - Need Project Feedback','du':'APP-AVS-PS','level':'9','levelLabel':'TL','skill':'Kubernetes','location':'Hyderabad','project':'Proximus TV Services Sourcing','createDate':'27-May-2025','expDate':'26-Dec-2026','ageing':'365+','ageDays':248,'pending':1},
+{'rrd':'R4878426','status':'Open - Need Project Feedback','du':'APP-CFP','level':'5','levelLabel':'AD','skill':'Software Product Management','location':'Bengaluru','project':'CoE Product Management','createDate':'19-Mar-2025','expDate':'01-Jun-2026','ageing':'365+','ageDays':122,'pending':1},
+{'rrd':'R4341334','status':'Open - In Process','du':'APP-LT-01','level':'Accenture Leadership','levelLabel':'Accenture Leadership','skill':'Product Lifecycle Management (PLM)','location':'Bengaluru','project':'APP-IG-MD','createDate':'02-Apr-2024','expDate':'31-Dec-2025','ageing':'365+','ageDays':120,'pending':1}
+];
 const RESOURCE_DATA = [
 {'name':'A K Lokesh Shakthi','eid':'C11035154','level':'11','levelLabel':'SE','du':'APP-NP-PS','fa':'PS','lock':'HL(Conf.Roll.Off)','rollOff':'31-Dec-2027','city':'Bengaluru','project':'APP_NP_PEPSI_FACTORY','rrd':'R3729995','primarySkill':'Microsoft ASP.NET'},
 {'name':'A S Shridhar Kakade','eid':'C12577884','level':'11','levelLabel':'SE','du':'APP-HPS-AHSS','fa':'PE','lock':'HL(Conf.Roll.Off)','rollOff':'31-Dec-2026','city':'Bengaluru','project':'REACH Product Engineering','rrd':'R5642690','primarySkill':'DevOps'},
@@ -2519,11 +2826,96 @@ function clearSkillSearch() {
   if (resEl) resEl.innerHTML='';
 }
 
+// =================== DEMANDS ===================
+function initDemands() {
+  const LEVEL_ORDER_D = ['12','11','10','9','8','7','6','5','Accenture Leadership'];
+
+  // By DU table
+  const duMap = {};
+  DEMAND_DATA.forEach(d => {
+    if (!duMap[d.du]) duMap[d.du] = {total:0, ip:0, nf:0, fp:0};
+    duMap[d.du].total++;
+    if (d.status === 'Open - In Process') duMap[d.du].ip++;
+    else if (d.status === 'Open - Need Project Feedback') duMap[d.du].nf++;
+    else if (d.status === 'Filled - Pending Joiner') duMap[d.du].fp++;
+  });
+  const duTbody = document.getElementById('demand-du-tbody');
+  if (duTbody) {
+    const sorted = Object.entries(duMap).sort((a,b) => b[1].total - a[1].total);
+    duTbody.innerHTML = sorted.map(([du, c]) =>
+      `<tr><td>${du}</td><td><strong>${c.total}</strong></td>
+       <td>${c.ip ? '<span class="badge badge-blue">'+c.ip+'</span>' : '—'}</td>
+       <td>${c.nf ? '<span class="badge badge-amber">'+c.nf+'</span>' : '—'}</td>
+       <td>${c.fp ? '<span class="badge badge-green">'+c.fp+'</span>' : '—'}</td></tr>`
+    ).join('');
+  }
+
+  // By Level table
+  const lvMap = {};
+  DEMAND_DATA.forEach(d => { lvMap[d.level] = (lvMap[d.level]||0) + 1; });
+  const total = DEMAND_DATA.length;
+  const lvTbody = document.getElementById('demand-level-tbody');
+  if (lvTbody) {
+    lvTbody.innerHTML = LEVEL_ORDER_D.filter(lv => lvMap[lv]).map(lv => {
+      const cnt = lvMap[lv] || 0;
+      const pct = (cnt/total*100).toFixed(1);
+      const label = LEVEL_MAP[lv] || lv;
+      return `<tr><td>L${lv} – ${label}</td><td>${cnt}</td>
+        <td><div class="bar-cell"><div class="bar-fill" style="width:${Math.min(pct*3,100)}%"></div><span>${pct}%</span></div></td></tr>`;
+    }).join('');
+  }
+
+  // Populate DU filter
+  const duFilter = document.getElementById('ageing-du-filter');
+  if (duFilter) {
+    const dus = [...new Set(DEMAND_DATA.map(d => d.du))].sort();
+    dus.forEach(du => {
+      const opt = document.createElement('option');
+      opt.value = du; opt.textContent = du;
+      duFilter.appendChild(opt);
+    });
+  }
+
+  renderAgeingTable();
+}
+
+function renderAgeingTable() {
+  const statusF = document.getElementById('ageing-status-filter')?.value || '';
+  const bucketF = document.getElementById('ageing-bucket-filter')?.value || '';
+  const duF = document.getElementById('ageing-du-filter')?.value || '';
+
+  let filtered = DEMAND_DATA;
+  if (statusF) filtered = filtered.filter(d => d.status === statusF);
+  if (bucketF) filtered = filtered.filter(d => d.ageing === bucketF);
+  if (duF) filtered = filtered.filter(d => d.du === duF);
+
+  // Sort: oldest first
+  filtered = [...filtered].sort((a,b) => b.ageDays - a.ageDays);
+
+  const tbody = document.getElementById('ageing-tbody');
+  if (!tbody) return;
+
+  const ageCls = {'365+':'badge-red','180-364':'badge-red','90-179':'badge-amber','<90':'badge-green'};
+  const stCls = {'Open - In Process':'badge-blue','Open - Need Project Feedback':'badge-amber','Filled - Pending Joiner':'badge-green'};
+
+  tbody.innerHTML = filtered.map(d => `<tr>
+    <td><span class="badge badge-grey">${d.rrd}</span></td>
+    <td>${d.du}</td>
+    <td><span class="badge badge-purple">L${d.level} ${LEVEL_MAP[d.level]||''}</span></td>
+    <td>${d.skill}</td>
+    <td>${d.location}</td>
+    <td>${d.createDate}</td>
+    <td><span class="badge ${ageCls[d.ageing]||'badge-grey'}">${d.ageing} days</span></td>
+    <td><span class="badge ${stCls[d.status]||'badge-grey'}" style="white-space:nowrap">${d.status}</span></td>
+  </tr>`).join('') || '<tr><td colspan="8" class="no-result">No demands match the selected filters.</td></tr>';
+}
+
 // =================== INIT ===================
 document.addEventListener('DOMContentLoaded', () => {
   drawDonut();
   buildUrgentList();
   initSkillSearch();
+  initDemands();
 });
 </script>
 </body>
