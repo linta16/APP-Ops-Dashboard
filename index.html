@@ -78,7 +78,7 @@
   .bar-cell span{font-size:.78rem;color:var(--text2);white-space:nowrap}
   
   /* Badges */
-  .badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.73rem;font-weight:600}
+  .badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.73rem;font-weight:600;white-space:nowrap}
   .badge-purple{background:var(--purple-light);color:var(--purple)}
   .badge-blue{background:#e6f9fc;color:var(--teal)}
   .badge-green{background:#e6faf4;color:var(--green)}
@@ -220,9 +220,9 @@
             <table>
               <thead><tr><th>Level</th><th>Count</th><th style="min-width:160px">Distribution</th></tr></thead>
               <tbody id="level-tbody">
-                <tr><td>L12 – SSE</td><td>205</td><td><div class='bar-cell'><div class='bar-fill' style='width:33%'></div><span>11.1%</span></div></td></tr>
+                <tr><td>L12 – ASE</td><td>205</td><td><div class='bar-cell'><div class='bar-fill' style='width:33%'></div><span>11.1%</span></div></td></tr>
 <tr><td>L11 – SE</td><td>440</td><td><div class='bar-cell'><div class='bar-fill' style='width:71%'></div><span>23.8%</span></div></td></tr>
-<tr><td>L10 – ASE</td><td>455</td><td><div class='bar-cell'><div class='bar-fill' style='width:74%'></div><span>24.6%</span></div></td></tr>
+<tr><td>L10 – SSE</td><td>455</td><td><div class='bar-cell'><div class='bar-fill' style='width:74%'></div><span>24.6%</span></div></td></tr>
 <tr><td>L9 – TL</td><td>352</td><td><div class='bar-cell'><div class='bar-fill' style='width:57%'></div><span>19.0%</span></div></td></tr>
 <tr><td>L8 – AM</td><td>227</td><td><div class='bar-cell'><div class='bar-fill' style='width:37%'></div><span>12.3%</span></div></td></tr>
 <tr><td>L7 – M</td><td>116</td><td><div class='bar-cell'><div class='bar-fill' style='width:19%'></div><span>6.3%</span></div></td></tr>
@@ -413,12 +413,14 @@
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- ===== DEMANDS DASHBOARD ===== -->
 <div class="tab-content" id="tab-demands">
   <div class="sub-tabs">
     <div class="sub-tab active" data-sub="overview" onclick="switchSub('demands','overview')">Overview</div>
+    <div class="sub-tab" data-sub="joiners" onclick="switchSub('demands','joiners')">Joiner Pipeline <span style="background:#00c48c;color:#fff;border-radius:10px;padding:1px 7px;font-size:.72rem;margin-left:4px">18</span></div>
   </div>
   <div class="subtab-content active" id="demandssub-overview">
     <div class="container">
@@ -483,6 +485,54 @@
           <table>
             <thead><tr><th>RRD</th><th>DU</th><th>Level</th><th>Skill</th><th>Location</th><th>Create Date</th><th>Age</th><th>Status</th></tr></thead>
             <tbody id="ageing-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Joiners Details sub-tab -->
+  <div class="subtab-content" id="demandssub-joiners">
+    <div class="container">
+      <div class="grid-2" style="align-items:start">
+
+        <!-- Single RRD lookup -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Single Joiner Lookup</span></div>
+          <div class="card-body">
+            <div class="section-label" style="margin-bottom:6px">Search by RRD or Skill</div>
+            <div style="display:flex;gap:8px">
+              <input type="text" class="search-input" id="joiner-single-input" placeholder="Enter RRD or skill keyword…" oninput="joinerSingleSearch()" />
+            </div>
+            <div id="joiner-single-results" style="margin-top:14px"></div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Filter Joiners</span></div>
+          <div class="card-body">
+            <div class="section-label" style="margin-bottom:6px">Filter by DU</div>
+            <select class="skill-select" id="jd-du-filter" onchange="renderJoinersDetail()" style="width:100%;margin-bottom:12px">
+              <option value="">All DUs</option>
+            </select>
+            <div class="section-label" style="margin-bottom:6px">Filter by Level</div>
+            <div class="chips-wrap" id="jd-level-chips"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Results table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Joiner Pipeline</span>
+          <span class="badge badge-green" id="jd-count-badge">18 joiners</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>RRD</th><th>DU</th><th>Level</th><th>Skill</th><th>Location</th><th>Project</th><th>Expected Joining Date</th></tr></thead>
+            <tbody id="jd-tbody"></tbody>
           </table>
         </div>
       </div>
@@ -2616,7 +2666,7 @@ function switchSub(main, sub) {
 }
 
 // =================== LEVEL MAP ===================
-const LEVEL_MAP = {'10':'ASE','11':'SE','12':'SSE','9':'TL','8':'AM','7':'M','6':'SM','5':'AD','Accenture Leadership':'MD'};
+const LEVEL_MAP = {'12':'ASE','11':'SE','10':'SSE','9':'TL','8':'AM','7':'M','6':'SM','5':'AD','4':'MD','3':'MD','Accenture Leadership':'MD'};
 const LEVEL_ORDER = ['12','11','10','9','8','7','6','5','Accenture Leadership'];
 
 // =================== ROLL-OFF HELPERS ===================
@@ -2910,12 +2960,97 @@ function renderAgeingTable() {
   </tr>`).join('') || '<tr><td colspan="8" class="no-result">No demands match the selected filters.</td></tr>';
 }
 
+// =================== JOINERS DETAIL (DEMANDS TAB) ===================
+function initJoinersDetail() {
+  const joiners = DEMAND_DATA.filter(d => d.status === 'Filled - Pending Joiner');
+  const LEVEL_ORDER_JD = ['12','11','10','9','8','7','6','5','Accenture Leadership'];
+
+  // DU filter
+  const duEl = document.getElementById('jd-du-filter');
+  if (duEl) {
+    [...new Set(joiners.map(j=>j.du))].sort().forEach(du => {
+      const o = document.createElement('option'); o.value=du; o.textContent=du; duEl.appendChild(o);
+    });
+  }
+
+  // Level chips
+  const chipsEl = document.getElementById('jd-level-chips');
+  if (chipsEl) {
+    LEVEL_ORDER_JD.filter(lv => joiners.some(j=>j.level===lv)).forEach(lv => {
+      const chip = document.createElement('div');
+      chip.className = 'chip'; chip.dataset.level = lv;
+      chip.textContent = (LEVEL_MAP[lv]||lv) + ' (L'+lv+')';
+      chip.onclick = () => {
+        chip.classList.toggle('active');
+        renderJoinersDetail();
+      };
+      chipsEl.appendChild(chip);
+    });
+  }
+
+  renderJoinersDetail();
+}
+
+function renderJoinersDetail() {
+  const duF = document.getElementById('jd-du-filter')?.value || '';
+  const activeLevels = [...document.querySelectorAll('#jd-level-chips .chip.active')].map(c=>c.dataset.level);
+  let data = DEMAND_DATA.filter(d => d.status === 'Filled - Pending Joiner');
+  if (duF) data = data.filter(d=>d.du===duF);
+  if (activeLevels.length) data = data.filter(d=>activeLevels.includes(d.level));
+
+  data = [...data].sort((a,b) => {
+    const parseD = s => { if(!s) return new Date(9999,0,1); const p=s.split('-'); const m={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}; return new Date(+p[2],m[p[1]],+p[0]); };
+    return parseD(a.expDate) - parseD(b.expDate);
+  });
+
+  const badge = document.getElementById('jd-count-badge');
+  if (badge) badge.textContent = data.length + ' joiner' + (data.length!==1?'s':'');
+
+  const tbody = document.getElementById('jd-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = data.map(j => buildJoinerRow(j)).join('')
+    || '<tr><td colspan="7" class="no-result">No joiners match the selected filters.</td></tr>';
+}
+
+function joinerSingleSearch() {
+  const q = document.getElementById('joiner-single-input').value.trim().toLowerCase();
+  const el = document.getElementById('joiner-single-results');
+  if (q.length < 2) { el.innerHTML=''; return; }
+  const matches = DEMAND_DATA.filter(d =>
+    d.status === 'Filled - Pending Joiner' &&
+    (d.rrd.toLowerCase().includes(q) || d.skill.toLowerCase().includes(q) || d.du.toLowerCase().includes(q))
+  );
+  el.innerHTML = matches.length
+    ? '<table><thead><tr><th>RRD</th><th>DU</th><th>Level</th><th>Skill</th><th>Location</th><th>Project</th><th>Expected Joining Date</th></tr></thead><tbody>'
+      + matches.map(j => buildJoinerRow(j)).join('') + '</tbody></table>'
+    : '<div class="no-result">No matches found.</div>';
+}
+
+function buildJoinerRow(j) {
+  const parts = j.expDate.split('-');
+  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const d = new Date(+parts[2], months[parts[1]], +parts[0]);
+  const now = new Date(2026,8,8);
+  const days = Math.round((d-now)/86400000);
+  const cls = days < 0 ? 'ro-urgent' : days <= 30 ? 'ro-soon' : 'ro-ok';
+  return `<tr>
+    <td><span class="badge badge-grey">${j.rrd}</span></td>
+    <td>${j.du}</td>
+    <td><span class="badge badge-purple">L${j.level} ${LEVEL_MAP[j.level]||''}</span></td>
+    <td>${j.skill}</td>
+    <td>${j.location}</td>
+    <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${j.project||'—'}</td>
+    <td class="${cls}">${j.expDate}</td>
+  </tr>`;
+}
+
 // =================== INIT ===================
 document.addEventListener('DOMContentLoaded', () => {
   drawDonut();
   buildUrgentList();
   initSkillSearch();
   initDemands();
+  initJoinersDetail();
 });
 </script>
 </body>
