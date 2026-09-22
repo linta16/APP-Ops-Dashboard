@@ -133,9 +133,17 @@ tr:hover td{background:var(--surface-1)}
 .search-hint{font-size:11px;color:var(--text-3);padding:6px 0;display:none}
 .search-hint.show{display:block}
 
+/* ── Agent bar (sticky top-right) ── */
+.agent-bar{
+  position:sticky;top:0;z-index:9999;
+  display:flex;justify-content:flex-end;
+  padding:8px 24px;
+  pointer-events:none;
+}
+.agent-bar > div{position:relative;pointer-events:all}
+
 /* ── Floating Agent Button ── */
 .agent-fab{
-  
   height:40px;padding:0 18px;
   background:var(--purple);
   border:none;border-radius:20px;
@@ -158,7 +166,7 @@ tr:hover td{background:var(--surface-1)}
 
 /* ── Agent Popup Panel ── */
 .agent-popup{
-  position:absolute;bottom:60px;right:0;z-index:9998;
+  position:absolute;top:52px;right:0;z-index:9998;
   width:380px;height:520px;
   background:var(--surface);
   border:1px solid var(--border);
@@ -245,6 +253,51 @@ tr:hover td{background:var(--surface-1)}
   <div class="tab active" data-tab="hc" onclick="switchTab('hc')">Headcount Dashboard</div>
   <div class="tab" data-tab="dem" onclick="switchTab('dem')">Demands Dashboard</div>
 </div>
+
+<!-- ═══════════════════════════════════════ FLOATING AGENT ═══════════════════════════════════════ -->
+<div class="agent-bar">
+  <div style="position:relative">
+    <!-- Popup panel -->
+    <div class="agent-popup" id="agent-popup">
+  <!-- Header -->
+  <div class="ap-hdr">
+    <div class="ap-icon">🤖</div>
+    <div class="ap-title">
+      <strong>Ask the Dashboard</strong>
+      <span id="agent-ctx-label">Loading data…</span>
+    </div>
+    <div class="ap-status"><span class="pulse-dot"></span>Live</div>
+    <button class="ap-close" onclick="toggleAgent()" title="Close">✕</button>
+  </div>
+  <!-- Suggestion chips -->
+  <div class="ap-chips">
+    <span class="ap-chip" onclick="agentAsk('How many resources are rolling off in the next 90 days?')">Rolling off ≤90d</span>
+    <span class="ap-chip" onclick="agentAsk('Top 5 DUs by headcount?')">Top DUs</span>
+    <span class="ap-chip" onclick="agentAsk('How many open demands older than 180 days?')">Ageing demands</span>
+    <span class="ap-chip" onclick="agentAsk('APP vs Reinvention.AI split?')">APP vs RAI</span>
+    <span class="ap-chip" onclick="agentAsk('Headcount by management level')">By level</span>
+    <span class="ap-chip" onclick="agentAsk('GCP resources by DU?')">GCP</span>
+  </div>
+  <!-- Chat -->
+  <div class="ap-chat" id="agent-chat">
+    <div class="ap-empty" id="agent-empty">
+      <div class="ap-empty-ico">💬</div>
+      <div>Ask anything about headcount or demands.<br>Use the chips above or type below.</div>
+    </div>
+  </div>
+  <!-- Input -->
+  <div class="ap-input-row">
+    <textarea id="agent-input" rows="1" placeholder="Ask a question…" onkeydown="agentKey(event)" oninput="agentResize(this)"></textarea>
+    <button class="ap-send" id="agent-send" onclick="agentSend()">➤</button>
+  </div>
+    </div><!-- end agent-popup -->
+    <!-- FAB trigger button -->
+    <button class="agent-fab" id="agent-fab" onclick="toggleAgent()" title="Ask Me">
+      ✦ Ask Me
+      <span class="agent-fab-badge" id="agent-fab-badge"></span>
+    </button>
+  </div>
+</div><!-- end agent-bar -->
 
 <!-- ═══════════════════════════════════════ HC TAB ═══════════════════════════════════════ -->
 <div class="tab-content active" id="tab-hc">
@@ -511,51 +564,6 @@ tr:hover td{background:var(--surface-1)}
     </div>
   </div>
 </div><!-- end tab-dem -->
-
-<!-- ═══════════════════════════════════════ FLOATING AGENT ═══════════════════════════════════════ -->
-<div class="agent-bar">
-  <div style="position:relative">
-    <!-- Popup panel -->
-    <div class="agent-popup" id="agent-popup">
-  <!-- Header -->
-  <div class="ap-hdr">
-    <div class="ap-icon">🤖</div>
-    <div class="ap-title">
-      <strong>Ask the Dashboard</strong>
-      <span id="agent-ctx-label">Loading data…</span>
-    </div>
-    <div class="ap-status"><span class="pulse-dot"></span>Live</div>
-    <button class="ap-close" onclick="toggleAgent()" title="Close">✕</button>
-  </div>
-  <!-- Suggestion chips -->
-  <div class="ap-chips">
-    <span class="ap-chip" onclick="agentAsk('How many resources are rolling off in the next 90 days?')">Rolling off ≤90d</span>
-    <span class="ap-chip" onclick="agentAsk('Top 5 DUs by headcount?')">Top DUs</span>
-    <span class="ap-chip" onclick="agentAsk('How many open demands older than 180 days?')">Ageing demands</span>
-    <span class="ap-chip" onclick="agentAsk('APP vs Reinvention.AI split?')">APP vs RAI</span>
-    <span class="ap-chip" onclick="agentAsk('Headcount by management level')">By level</span>
-    <span class="ap-chip" onclick="agentAsk('GCP resources by DU?')">GCP</span>
-  </div>
-  <!-- Chat -->
-  <div class="ap-chat" id="agent-chat">
-    <div class="ap-empty" id="agent-empty">
-      <div class="ap-empty-ico">💬</div>
-      <div>Ask anything about headcount or demands.<br>Use the chips above or type below.</div>
-    </div>
-  </div>
-  <!-- Input -->
-  <div class="ap-input-row">
-    <textarea id="agent-input" rows="1" placeholder="Ask a question…" onkeydown="agentKey(event)" oninput="agentResize(this)"></textarea>
-    <button class="ap-send" id="agent-send" onclick="agentSend()">➤</button>
-  </div>
-    </div><!-- end agent-popup -->
-    <!-- FAB trigger button -->
-    <button class="agent-fab" id="agent-fab" onclick="toggleAgent()" title="Ask Me">
-      ✦ Ask Me
-      <span class="agent-fab-badge" id="agent-fab-badge"></span>
-    </button>
-  </div>
-</div><!-- end agent-bar -->
 
 <div class="ftr">Accenture Products &amp; Platforms &nbsp;·&nbsp; HC: 22 Sep 2026 &nbsp;|&nbsp; Demands: 22 Sep 2026</div>
 
