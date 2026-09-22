@@ -1058,32 +1058,13 @@ async function agentSend() {
   document.getElementById('agent-send').disabled = true;
   inp.value = ''; agentResize(inp);
   agentAddMsg('user', txt);
-  // Build dynamic record context for this specific question
-  const recordCtx = extractRecords(txt);
-  const enrichedTxt = recordCtx ? txt + recordCtx : txt;
-  agentHistory.push({role:'user', content:enrichedTxt});
   const tw = agentAddMsg('agent', 'Thinking…', true);
+  // Small delay so the UI renders before we run JS
+  await new Promise(r => setTimeout(r, 120));
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-calls':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:1000,
-        system: agentCtx,
-        messages: agentHistory.slice(-10)
-      })
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const reply = (data.content||[]).map(b=>b.text||'').join('');
+    const reply = localAnswer(txt);
     tw.classList.remove('thinking');
     agentUpdateBubble(tw, reply);
-    agentHistory.push({role:'assistant', content:reply});
   } catch(e) {
     tw.classList.remove('thinking');
     agentUpdateBubble(tw, '⚠️ ' + e.message);
@@ -1091,6 +1072,246 @@ async function agentSend() {
   agentBusy = false;
   document.getElementById('agent-send').disabled = false;
   inp.focus();
+}
+
+// ── LOCAL ANSWER ENGINE (no external API, SharePoint-safe) ──────────────────
+function localAnswer(question) {
+  const q = question.toLowerCase().replace(/[?!]/g,'').trim();
+  const levels = ['ASE','SE','SSE','TL','AM','M','SM','AD','MD'];
+  const levelMap = {'ase':'ASE','se':'SE','sse':'SSE','tl':'TL','am':'AM','sm':'SM','ad':'AD','md':'MD'};
+  const fmt = n => Number(n).toLocaleString();
+
+  // ── Detect level ──
+  let levelFilter = null;
+  for (const [k,v] of Object.entries(levelMap)) {
+    if (new RegExp(`\\b${k}\\b`).test(q)) { levelFilter = v; break; }
+  }
+
+  // ── Detect city ──
+  const cities = ['bengaluru','bangalore','hyderabad','chennai','pune','mumbai','gurugram','noida','kolkata','coimbatore','bhubaneswar','jaipur','indore','nagpur','ahmedabad'];
+  let cityFilter = null;
+  for (const c of cities) { if (q.includes(c)) { cityFilter = c; break; } }
+
+  // ── Detect DU ──
+  const duMatch = question.match(/APP-[\w&]+(?:-[\w&]+)*/i);
+  let duFilter = duMatch ? duMatch[0].toUpperCase() : null;
+
+  // ── Detect skill ──
+  const skillKws = ['java','python','react','angular','node','devops','salesforce','sap','aws','azure','selenium','spring','machine learning','generative ai','prompt engineering','alip','technical documentation'];
+  let skillFilter = null;
+  for (const sk of skillKws) { if (q.includes(sk)) { skillFilter = sk; break; } }
+
+  // ── Flags ──
+  const gcpFlag    = /\bgcp\b/.test(q) && !/demand/.test(q);
+  const raiFlag    = /reinvention|rai-pe|\brai\b/.test(q);
+  const demandQ    = /demand/.test(q);
+  const rolloffQ   = /roll.?off|rolling off/.test(q);
+  const r90        = /90.day|next 90|rolling off/.test(q);
+  const faPSQ      = /\bps\b|professional service/.test(q) && !/\bpe\b/.test(q);
+  const faPEQ      = /\bpe\b|product engineering/.test(q) && !/\bps\b/.test(q);
+
+  // ── Name/EID tokens ──
+  const stopWords = new Set(['what','which','where','when','who','how','the','this','that','their','show','list','give','find','tell','does','level','name','project','skill','city','roll','many','are','for','and','top','from','than','days','have','with','all','open','close','demand','resource','team']);
+  const eidMatches = question.match(/\b([A-Z]{1,5}\d{5,})\b/g) || [];
+  const capWords = (question.match(/\b([A-Z][a-z]{2,})\b/g) || []).filter(w => !stopWords.has(w.toLowerCase()));
+  const nameTokens = [...eidMatches.map(e=>e.toLowerCase()), ...capWords.map(w=>w.toLowerCase())];
+
+  // ══════════════════════════════════════════
+  // DEMAND QUESTIONS
+  // ══════════════════════════════════════════
+  if (demandQ) {
+    let dem = DEMANDS_DATA.filter(d => d.st.startsWith('Open'));
+
+    // Ageing
+    const age365 = /365/.test(q);
+    const age180 = /180/.test(q);
+    const age90c  = /90/.test(q) && !/next 90|roll/.test(q);
+
+    if (levelFilter) dem = dem.filter(d => d.l === levelFilter);
+    if (duFilter)    dem = dem.filter(d => d.du.toUpperCase() === duFilter);
+    if (skillFilter) dem = dem.filter(d => d.sk.toLowerCase().includes(skillFilter));
+
+    let ageSuffix = '';
+    if (age365) {
+      dem = dem.filter(d => { const x = ageDays(d.cd); return x !== null && x >= 365; });
+      ageSuffix = ' aged 365+ days';
+    } else if (age180) {
+      dem = dem.filter(d => { const x = ageDays(d.cd); return x !== null && x >= 180; });
+      ageSuffix = ' aged 180+ days';
+    } else if (age90c) {
+      dem = dem.filter(d => { const x = ageDays(d.cd); return x !== null && x >= 90; });
+      ageSuffix = ' aged 90+ days';
+    }
+
+    // Count-only question
+    if (/how many|count|total|number/.test(q)) {
+      const byBucket = { '365+':0, '180–364':0, '90–179':0, 'Under 90':0 };
+      DEMANDS_DATA.filter(d=>d.st.startsWith('Open')).forEach(d => {
+        const x = ageDays(d.cd);
+        if (x===null) return;
+        if (x>=365) byBucket['365+']++;
+        else if (x>=180) byBucket['180–364']++;
+        else if (x>=90) byBucket['90–179']++;
+        else byBucket['Under 90']++;
+      });
+
+      if (age365) return `There are ${fmt(byBucket['365+'])} open demands aged 365+ days.`;
+      if (age180) return `There are ${fmt(dem.length)} open demands aged 180+ days (180–364: ${fmt(byBucket['180–364'])}, 365+: ${fmt(byBucket['365+'])}).`;
+      if (age90c)  return `There are ${fmt(dem.length)} open demands aged 90+ days.`;
+
+      // General demand counts
+      const total = DEMANDS_DATA.length;
+      const openAll = DEMANDS_DATA.filter(d=>d.st.startsWith('Open')).length;
+      const inProc  = DEMANDS_DATA.filter(d=>d.st==='Open - In Process').length;
+      const needFb  = DEMANDS_DATA.filter(d=>d.st==='Open - Need Project Feedback').length;
+      const conf    = DEMANDS_DATA.filter(d=>d.st==='Open - Confirming Candidate').length;
+      const filled  = DEMANDS_DATA.filter(d=>d.st.startsWith('Filled')).length;
+      if (levelFilter) return `There are ${fmt(dem.length)} open demands at ${levelFilter} level.`;
+      if (duFilter)    return `There are ${fmt(dem.length)} open demands in ${duFilter}.`;
+      return `Total demands: ${fmt(total)}\n• Open: ${fmt(openAll)} (In Process: ${fmt(inProc)}, Need Feedback: ${fmt(needFb)}, Confirming: ${fmt(conf)})\n• Filled – Pending Joiner: ${fmt(filled)}`;
+    }
+
+    // List/show demands
+    if (!dem.length) return `No open demands found${levelFilter?' at '+levelFilter:''}${duFilter?' in '+duFilter:''}${ageSuffix}.`;
+    const rows = dem.slice(0,30).map(d => `• ${d.rrd} | ${d.du} | ${d.l} | ${d.sk||'—'} | ${d.cd} (${ageDays(d.cd)??'?'}d)`).join('\n');
+    return `Found ${fmt(dem.length)} open demand${dem.length>1?'s':''}${ageSuffix}${dem.length>30?` (showing first 30)`:''}:\n\nRRD | DU | Level | Skill | Created | Age\n${rows}`;
+  }
+
+  // ══════════════════════════════════════════
+  // HEADCOUNT QUESTIONS
+  // ══════════════════════════════════════════
+
+  // GCP breakdown
+  if (gcpFlag) {
+    const gcpRes = RESOURCE_DATA.filter(r => r.gcp);
+    const byDU = {};
+    gcpRes.forEach(r => { byDU[r.du] = (byDU[r.du]||0)+1; });
+    const rows = Object.entries(byDU).sort((a,b)=>b[1]-a[1]).map(([du,n])=>`• ${du}: ${n}`).join('\n');
+    return `There are ${fmt(gcpRes.length)} GCP (Global Career Program) resources:\n\n${rows}`;
+  }
+
+  // Roll-off questions
+  if (rolloffQ || r90) {
+    const res90 = RESOURCE_DATA.filter(r => {
+      if (!r.ro) return false;
+      const d = (new Date(r.ro) - TODAY) / 86400000;
+      return d >= 0 && d <= 90;
+    });
+    if (/how many|count/.test(q)) return `${fmt(res90.length)} resources are rolling off within the next 90 days (by 22 Dec 2026).`;
+    const rows = res90.sort((a,b)=>new Date(a.ro)-new Date(b.ro)).slice(0,30).map(r=>`• ${r.n} | ${r.l} | ${r.du} | ${r.ro}`).join('\n');
+    return `${fmt(res90.length)} resource${res90.length!==1?'s':''} rolling off ≤90 days:\n\nName | Level | DU | Roll-off\n${rows}${res90.length>30?'\n…and more.':''}`;
+  }
+
+  // APP vs RAI split
+  if (/reinvention|rai|app.*(split|vs|versus)|split.*app/.test(q)) {
+    const rai = RESOURCE_DATA.filter(r=>r.rai).length;
+    const app = RESOURCE_DATA.length - rai;
+    return `APP vs Reinvention.AI headcount split:\n• APP (core): ${fmt(app)}\n• Reinvention.AI (APP-NFR-PE, APP-TechDoc-COE, APP-RAI-PE): ${fmt(rai)}\n• Total: ${fmt(RESOURCE_DATA.length)}`;
+  }
+
+  // PS vs PE split
+  if (/ps.*pe|pe.*ps|functional area|fa split/.test(q)) {
+    const ps = RESOURCE_DATA.filter(r=>r.fa==='PS').length;
+    const pe = RESOURCE_DATA.filter(r=>r.fa==='PE').length;
+    const ot = RESOURCE_DATA.length - ps - pe;
+    return `Functional Area split:\n• PS (Professional Services): ${fmt(ps)}\n• PE (Product Engineering): ${fmt(pe)}\n• Other: ${fmt(ot)}\n• Total: ${fmt(RESOURCE_DATA.length)}`;
+  }
+
+  // By level breakdown
+  if (/by level|level.*(break|count|split)|management level/.test(q) && !levelFilter) {
+    const rows = levels.map(l => {
+      const n = RESOURCE_DATA.filter(r=>r.l===l).length;
+      return `• ${l}: ${fmt(n)}`;
+    }).join('\n');
+    return `Headcount by Management Level:\n${rows}\n• Total: ${fmt(RESOURCE_DATA.length)}`;
+  }
+
+  // Top DUs
+  if (/top.*du|du.*headcount|by du|by delivery unit/.test(q) && !demandQ) {
+    const duCnt = {};
+    RESOURCE_DATA.forEach(r => { duCnt[r.du]=(duCnt[r.du]||0)+1; });
+    const top = Object.entries(duCnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const rows = top.map(([du,n],i)=>`${i+1}. ${du}: ${fmt(n)}`).join('\n');
+    return `Top 10 DUs by Headcount:\n${rows}`;
+  }
+
+  // By location
+  if (/location|city|where|bengaluru|bangalore|hyderabad|chennai|pune|mumbai/.test(q) && !nameTokens.length) {
+    const loc = {};
+    RESOURCE_DATA.forEach(r => { const l=r.loc||'Unknown'; loc[l]=(loc[l]||0)+1; });
+    const top = Object.entries(loc).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const rows = top.map(([l,n])=>`• ${l}: ${fmt(n)}`).join('\n');
+    if (cityFilter) {
+      let res = RESOURCE_DATA.filter(r=>r.loc.toLowerCase().includes(cityFilter));
+      if (levelFilter) res = res.filter(r=>r.l===levelFilter);
+      if (/how many|count/.test(q)) return `There are ${fmt(res.length)} resource${res.length!==1?'s':''} in ${cityFilter.charAt(0).toUpperCase()+cityFilter.slice(1)}${levelFilter?' at '+levelFilter+' level':''}.`;
+      const rrows = res.slice(0,30).map(r=>`• ${r.n} | ${r.l} | ${r.du} | ${r.ro||'—'}`).join('\n');
+      return `${fmt(res.length)} resource${res.length!==1?'s':''} in ${cityFilter.charAt(0).toUpperCase()+cityFilter.slice(1)}${levelFilter?' ('+levelFilter+')':''}${res.length>30?' (showing first 30)':''}:\n\n${rrows}`;
+    }
+    return `Headcount by Location:\n${rows}`;
+  }
+
+  // Name / EID lookup
+  if (nameTokens.length > 0) {
+    const matches = RESOURCE_DATA.filter(r =>
+      nameTokens.some(t => r.n.toLowerCase().includes(t) || r.e.toLowerCase() === t)
+    );
+    if (!matches.length) return `No resources found matching "${question}". Try a name, EID, or use the Resource Search tab for more options.`;
+    if (matches.length === 1) {
+      const r = matches[0];
+      const diffDays = r.ro ? Math.round((new Date(r.ro)-TODAY)/86400000) : null;
+      const roNote = diffDays !== null ? `${r.ro} (${diffDays>0?diffDays+'d remaining':'rolled off'})` : '—';
+      return `Found: ${r.n}\n• EID: ${r.e}\n• Level: ${r.l}\n• DU: ${r.du}\n• Location: ${r.loc}\n• FA: ${r.fa}\n• Project: ${r.proj||'—'}\n• Skill: ${r.sk||'—'}\n• Roll-off: ${roNote}\n• GCP: ${r.gcp?'Yes':'No'}`;
+    }
+    const rows = matches.slice(0,20).map(r=>`• ${r.n} | ${r.e} | ${r.l} | ${r.du} | ${r.loc}`).join('\n');
+    return `Found ${fmt(matches.length)} match${matches.length!==1?'es':''}:\n\nName | EID | Level | DU | City\n${rows}${matches.length>20?'\n…and more. Use Resource Search for full results.':''}`;
+  }
+
+  // Specific level + optional city/DU
+  if (levelFilter) {
+    let res = RESOURCE_DATA.filter(r=>r.l===levelFilter);
+    if (cityFilter) res = res.filter(r=>r.loc.toLowerCase().includes(cityFilter));
+    if (duFilter)   res = res.filter(r=>r.du.toUpperCase()===duFilter);
+    if (faPSQ) res = res.filter(r=>r.fa==='PS');
+    if (faPEQ) res = res.filter(r=>r.fa==='PE');
+    if (/how many|count/.test(q)) return `There are ${fmt(res.length)} ${levelFilter} resources${cityFilter?' in '+cityFilter:''}${duFilter?' in '+duFilter:''}.`;
+    const rows = res.slice(0,30).map(r=>`• ${r.n} | ${r.e} | ${r.du} | ${r.loc} | ${r.ro||'—'}`).join('\n');
+    return `${fmt(res.length)} ${levelFilter} resource${res.length!==1?'s':''}${cityFilter?' in '+cityFilter:''}${duFilter?' in '+duFilter:''}${res.length>30?' (first 30 shown)':''}:\n\nName | EID | DU | City | Roll-off\n${rows}`;
+  }
+
+  // Total HC
+  if (/total|how many|count|headcount|hc/.test(q)) {
+    const total = RESOURCE_DATA.length;
+    const atci = RESOURCE_DATA.filter(r=>r.lock==='HL(Conf.Roll.Off)').length;
+    const gcp  = RESOURCE_DATA.filter(r=>r.gcp).length;
+    const rai  = RESOURCE_DATA.filter(r=>r.rai).length;
+    return `Total headcount: ${fmt(total)}\n• ATCI Locked: ${fmt(atci)}\n• GCP resources: ${fmt(gcp)}\n• APP core: ${fmt(total-rai)} | Reinvention.AI: ${fmt(rai)}`;
+  }
+
+  // Skill search
+  if (skillFilter) {
+    let res = RESOURCE_DATA.filter(r=>r.sk.toLowerCase().includes(skillFilter));
+    if (levelFilter) res = res.filter(r=>r.l===levelFilter);
+    if (!res.length) return `No resources found with skill matching "${skillFilter}".`;
+    const byLevel = {};
+    res.forEach(r=>{ byLevel[r.l]=(byLevel[r.l]||0)+1; });
+    const lvlSummary = levels.filter(l=>byLevel[l]).map(l=>`${l}:${byLevel[l]}`).join(', ');
+    const rows = res.slice(0,20).map(r=>`• ${r.n} | ${r.l} | ${r.du} | ${r.loc}`).join('\n');
+    return `${fmt(res.length)} resource${res.length!==1?'s':''} with "${skillFilter}" skill (${lvlSummary})${res.length>20?' — first 20 shown':''}:\n\n${rows}`;
+  }
+
+  // DU filter
+  if (duFilter) {
+    const res = RESOURCE_DATA.filter(r=>r.du.toUpperCase()===duFilter);
+    if (/how many|count/.test(q)) return `${duFilter} has ${fmt(res.length)} resources.`;
+    const byLevel = {};
+    res.forEach(r=>{ byLevel[r.l]=(byLevel[r.l]||0)+1; });
+    const lvlSummary = levels.filter(l=>byLevel[l]).map(l=>`${l}:${byLevel[l]}`).join(', ');
+    return `${duFilter}: ${fmt(res.length)} resources\nBy level: ${lvlSummary||'N/A'}`;
+  }
+
+  // Fallback
+  return `I can answer questions about headcount, demands, GCP resources, roll-offs, DUs, levels, locations, and individual resources. Try asking:\n• "How many SE resources are in Bengaluru?"\n• "List resources rolling off in 90 days"\n• "What is Linta Sebastian's DU?"\n• "How many open demands older than 180 days?"\n• "Show headcount by level"`;
 }
 
 function agentAsk(q) {
