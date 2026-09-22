@@ -1047,31 +1047,33 @@ function agentUpdateBubble(wrap, text) {
   document.getElementById('agent-chat').scrollTop = 99999;
 }
 
-async function agentSend() {
+function agentSend() {
   if (agentBusy) return;
-  const inp = document.getElementById('agent-input');
-  const txt = inp.value.trim();
+  var inp = document.getElementById('agent-input');
+  var txt = inp.value.trim();
   if (!txt) return;
   if (!agentCtx) initAgent();
   agentClearEmpty();
   agentBusy = true;
   document.getElementById('agent-send').disabled = true;
-  inp.value = ''; agentResize(inp);
+  inp.value = '';
+  inp.style.height = '40px';
   agentAddMsg('user', txt);
-  const tw = agentAddMsg('agent', 'Thinking…', true);
-  // Small delay so the UI renders before we run JS
-  await new Promise(r => setTimeout(r, 120));
-  try {
-    const reply = localAnswer(txt);
+  var tw = agentAddMsg('agent', 'Thinking…', true);
+  // Use setTimeout so UI renders the "Thinking" bubble before we compute
+  setTimeout(function() {
+    var reply;
+    try {
+      reply = localAnswer(txt);
+    } catch(err) {
+      reply = 'Error: ' + err.message;
+    }
     tw.classList.remove('thinking');
     agentUpdateBubble(tw, reply);
-  } catch(e) {
-    tw.classList.remove('thinking');
-    agentUpdateBubble(tw, '⚠️ ' + e.message);
-  }
-  agentBusy = false;
-  document.getElementById('agent-send').disabled = false;
-  inp.focus();
+    agentBusy = false;
+    document.getElementById('agent-send').disabled = false;
+    inp.focus();
+  }, 80);
 }
 
 // ── LOCAL ANSWER ENGINE (no external API, SharePoint-safe) ──────────────────
