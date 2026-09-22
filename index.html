@@ -14,11 +14,14 @@
   --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-m:0 2px 8px rgba(0,0,0,.1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--surface-1);color:var(--text);font-size:14px}
+/* SharePoint iframe fix: html+body must fill and scroll within this document
+   so position:fixed anchors to this frame's viewport, not a clipped parent */
+html{height:100%;overflow-y:auto}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--surface-1);color:var(--text);font-size:14px;min-height:100%;position:relative}
 a{color:var(--teal);text-decoration:none}
 
 /* ── Header ── */
-.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:999}
 .hdr-title{font-size:16px;font-weight:700;color:var(--text)}
 .hdr-sub{font-size:12px;color:var(--text-3);margin-top:1px}
 .hdr-badge{margin-left:auto;background:var(--teal-l);color:var(--teal-d);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
@@ -132,7 +135,7 @@ tr:hover td{background:var(--surface-1)}
 
 /* ── Floating Agent Button ── */
 .agent-fab{
-  position:fixed;bottom:24px;right:24px;z-index:9999;
+  position:fixed;bottom:24px;right:24px;z-index:2147483646;transform:translateZ(0);
   height:40px;padding:0 18px;
   background:var(--purple);
   border:none;border-radius:20px;
@@ -155,7 +158,7 @@ tr:hover td{background:var(--surface-1)}
 
 /* ── Agent Popup Panel ── */
 .agent-popup{
-  position:fixed;bottom:76px;right:24px;z-index:9998;
+  position:fixed;bottom:76px;right:24px;z-index:2147483645;
   width:380px;height:520px;
   background:var(--surface);
   border:1px solid var(--border);
@@ -1105,6 +1108,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGCPTable();
   initSkillSearch();
   initDemands();
+  // SharePoint iframe fix: ensure FAB is visible regardless of parent frame clipping
+  const fab = document.getElementById('agent-fab');
+  if (fab) {
+    fab.style.cssText += ';position:fixed!important;bottom:24px!important;right:24px!important;display:flex!important;visibility:visible!important;opacity:1!important;';
+  }
 });
 </script>
 </body>
