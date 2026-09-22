@@ -135,7 +135,7 @@ tr:hover td{background:var(--surface-1)}
 
 /* ── Floating Agent Button ── */
 .agent-fab{
-  position:fixed;bottom:24px;right:24px;z-index:2147483646;transform:translateZ(0);
+  
   height:40px;padding:0 18px;
   background:var(--purple);
   border:none;border-radius:20px;
@@ -158,7 +158,7 @@ tr:hover td{background:var(--surface-1)}
 
 /* ── Agent Popup Panel ── */
 .agent-popup{
-  position:fixed;bottom:76px;right:24px;z-index:2147483645;
+  position:absolute;bottom:60px;right:0;z-index:9998;
   width:380px;height:520px;
   background:var(--surface);
   border:1px solid var(--border);
@@ -513,15 +513,10 @@ tr:hover td{background:var(--surface-1)}
 </div><!-- end tab-dem -->
 
 <!-- ═══════════════════════════════════════ FLOATING AGENT ═══════════════════════════════════════ -->
-
-<!-- FAB trigger button -->
-<button class="agent-fab" id="agent-fab" onclick="toggleAgent()" title="Ask Me">
-  ✦ Ask Me
-  <span class="agent-fab-badge" id="agent-fab-badge"></span>
-</button>
-
-<!-- Popup panel -->
-<div class="agent-popup" id="agent-popup">
+<div class="agent-bar">
+  <div style="position:relative">
+    <!-- Popup panel -->
+    <div class="agent-popup" id="agent-popup">
   <!-- Header -->
   <div class="ap-hdr">
     <div class="ap-icon">🤖</div>
@@ -553,7 +548,14 @@ tr:hover td{background:var(--surface-1)}
     <textarea id="agent-input" rows="1" placeholder="Ask a question…" onkeydown="agentKey(event)" oninput="agentResize(this)"></textarea>
     <button class="ap-send" id="agent-send" onclick="agentSend()">➤</button>
   </div>
-</div><!-- end agent-popup -->
+    </div><!-- end agent-popup -->
+    <!-- FAB trigger button -->
+    <button class="agent-fab" id="agent-fab" onclick="toggleAgent()" title="Ask Me">
+      ✦ Ask Me
+      <span class="agent-fab-badge" id="agent-fab-badge"></span>
+    </button>
+  </div>
+</div><!-- end agent-bar -->
 
 <div class="ftr">Accenture Products &amp; Platforms &nbsp;·&nbsp; HC: 22 Sep 2026 &nbsp;|&nbsp; Demands: 22 Sep 2026</div>
 
@@ -1108,11 +1110,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGCPTable();
   initSkillSearch();
   initDemands();
-  // SharePoint iframe fix: ensure FAB is visible regardless of parent frame clipping
-  const fab = document.getElementById('agent-fab');
-  if (fab) {
-    fab.style.cssText += ';position:fixed!important;bottom:24px!important;right:24px!important;display:flex!important;visibility:visible!important;opacity:1!important;';
-  }
+
 });
 </script>
 </body>
