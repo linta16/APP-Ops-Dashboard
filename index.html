@@ -102,7 +102,7 @@ tr:hover td{background:#f9f0ff}
 .agent-bar{position:sticky;bottom:0;z-index:9999;display:flex;justify-content:flex-end;padding:10px 24px 14px;pointer-events:none}
 .agent-fab{pointer-events:all;height:40px;padding:0 18px;background:var(--purple);border:none;border-radius:20px;color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 4px 16px rgba(161,0,255,.45);display:flex;align-items:center;gap:7px;transition:transform .15s,box-shadow .15s;white-space:nowrap;position:relative}
 .agent-fab:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(161,0,255,.55)}
-.agent-popup{position:absolute;bottom:52px;right:0;z-index:9998;width:380px;background:var(--surface);border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.18);border:1px solid var(--border);display:none;flex-direction:column;overflow:hidden;transform:scale(.92) translateY(-12px);transform-origin:top right;transition:transform .18s,opacity .18s;opacity:0}
+.agent-popup{pointer-events:all;position:absolute;bottom:52px;right:0;z-index:9998;width:380px;background:var(--surface);border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.18);border:1px solid var(--border);display:none;flex-direction:column;overflow:hidden;transform:scale(.92) translateY(-12px);transform-origin:top right;transition:transform .18s,opacity .18s;opacity:0}
 .agent-popup.open{display:flex;transform:scale(1) translateY(0);opacity:1}
 .agent-ph{padding:12px 16px;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:space-between}
 .agent-ph span{font-weight:600;font-size:13px}
@@ -116,6 +116,7 @@ tr:hover td{background:#f9f0ff}
 .agent-input-row textarea{flex:1;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:none;outline:none;max-height:100px}
 .agent-input-row textarea:focus{border-color:var(--purple)}
 .agent-input-row button{align-self:flex-end;padding:8px 14px;background:var(--purple);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.du-row{cursor:pointer}.du-row td:first-child{color:var(--purple);font-weight:600}.du-hint{font-size:11px;color:var(--text-2);font-weight:400;margin-left:8px}
 .ftr{padding:16px 28px;text-align:center;font-size:12px;color:var(--text-2);border-top:1px solid var(--border)}
 @media(max-width:700px){
   .two-col,.three-col{grid-template-columns:1fr}
@@ -183,30 +184,30 @@ tr:hover td{background:#f9f0ff}
     </div>
 
     <div class="two-col">
-      <div class="card"><div class="sec-hdr">Headcount by Delivery Unit</div><div class="tbl-wrap"><table>
+      <div class="card"><div class="sec-hdr">Headcount by Delivery Unit<span class="du-hint">click a DU to see people</span></div><div class="tbl-wrap"><table>
         <thead><tr><th>DU</th><th>FA</th><th class="num">HC</th><th class="num">% of HC</th></tr></thead>
-        <tbody><tr><td>APP-NP-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>229</b></td><td class="num">12.6%</td></tr>
-<tr><td>APP-ALIP-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>227</b></td><td class="num">12.5%</td></tr>
-<tr><td>APP-HPS-AHSS</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>166</b></td><td class="num">9.1%</td></tr>
-<tr><td>APTP</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>155</b></td><td class="num">8.5%</td></tr>
-<tr><td>APP-ASCG-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>134</b></td><td class="num">7.4%</td></tr>
-<tr><td>APP-NP-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>123</b></td><td class="num">6.8%</td></tr>
-<tr><td>APP-AVS-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>111</b></td><td class="num">6.1%</td></tr>
-<tr><td>APP-LS-INTIENT-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>97</b></td><td class="num">5.3%</td></tr>
-<tr><td>APP-RAI-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>97</b></td><td class="num">5.3%</td></tr>
-<tr><td>APP-ASCG-OP-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>83</b></td><td class="num">4.6%</td></tr>
-<tr><td>APP-D&amp;AI-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>82</b></td><td class="num">4.5%</td></tr>
-<tr><td>APP-AVS-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>81</b></td><td class="num">4.5%</td></tr>
-<tr><td>APP-LS-INTIENT-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>57</b></td><td class="num">3.1%</td></tr>
-<tr><td>APP-NFR-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>57</b></td><td class="num">3.1%</td></tr>
-<tr><td>APP-TechDoc-COE</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>40</b></td><td class="num">2.2%</td></tr>
-<tr><td>APP-ACAN</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>26</b></td><td class="num">1.4%</td></tr>
-<tr><td>APP Biz Enablement</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>16</b></td><td class="num">0.9%</td></tr>
-<tr><td>APP-AFTP</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>13</b></td><td class="num">0.7%</td></tr>
-<tr><td>APP-CFP</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>12</b></td><td class="num">0.7%</td></tr>
-<tr><td>APP-ASCG-Cloud-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>6</b></td><td class="num">0.3%</td></tr>
-<tr><td>APP-ALV-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>4</b></td><td class="num">0.2%</td></tr>
-<tr><td>APP-LT-01</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>1</b></td><td class="num">0.1%</td></tr></tbody></table></div></div>
+        <tbody><tr class="du-row" data-du="APP-NP-PS" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-NP-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>229</b></td><td class="num">12.6%</td></tr>
+<tr class="du-row" data-du="APP-ALIP-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-ALIP-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>227</b></td><td class="num">12.5%</td></tr>
+<tr class="du-row" data-du="APP-HPS-AHSS" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-HPS-AHSS</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>166</b></td><td class="num">9.1%</td></tr>
+<tr class="du-row" data-du="APTP" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APTP</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>155</b></td><td class="num">8.5%</td></tr>
+<tr class="du-row" data-du="APP-ASCG-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-ASCG-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>134</b></td><td class="num">7.4%</td></tr>
+<tr class="du-row" data-du="APP-NP-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-NP-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>123</b></td><td class="num">6.8%</td></tr>
+<tr class="du-row" data-du="APP-AVS-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-AVS-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>111</b></td><td class="num">6.1%</td></tr>
+<tr class="du-row" data-du="APP-LS-INTIENT-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-LS-INTIENT-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>97</b></td><td class="num">5.3%</td></tr>
+<tr class="du-row" data-du="APP-RAI-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-RAI-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>97</b></td><td class="num">5.3%</td></tr>
+<tr class="du-row" data-du="APP-ASCG-OP-PS" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-ASCG-OP-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>83</b></td><td class="num">4.6%</td></tr>
+<tr class="du-row" data-du="APP-D&amp;AI-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-D&amp;AI-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>82</b></td><td class="num">4.5%</td></tr>
+<tr class="du-row" data-du="APP-AVS-PS" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-AVS-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>81</b></td><td class="num">4.5%</td></tr>
+<tr class="du-row" data-du="APP-LS-INTIENT-PS" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-LS-INTIENT-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>57</b></td><td class="num">3.1%</td></tr>
+<tr class="du-row" data-du="APP-NFR-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-NFR-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>57</b></td><td class="num">3.1%</td></tr>
+<tr class="du-row" data-du="APP-TechDoc-COE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-TechDoc-COE</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>40</b></td><td class="num">2.2%</td></tr>
+<tr class="du-row" data-du="APP-ACAN" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-ACAN</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>26</b></td><td class="num">1.4%</td></tr>
+<tr class="du-row" data-du="APP Biz Enablement" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP Biz Enablement</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>16</b></td><td class="num">0.9%</td></tr>
+<tr class="du-row" data-du="APP-AFTP" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-AFTP</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>13</b></td><td class="num">0.7%</td></tr>
+<tr class="du-row" data-du="APP-CFP" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-CFP</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>12</b></td><td class="num">0.7%</td></tr>
+<tr class="du-row" data-du="APP-ASCG-Cloud-PS" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-ASCG-Cloud-PS</td><td><span class="badge badge-ps">PS</span></td><td class="num"><b>6</b></td><td class="num">0.3%</td></tr>
+<tr class="du-row" data-du="APP-ALV-PE" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-ALV-PE</td><td><span class="badge badge-pe">PE</span></td><td class="num"><b>4</b></td><td class="num">0.2%</td></tr>
+<tr class="du-row" data-du="APP-LT-01" onclick="openDuDrill(this.dataset.du)" title="Click to list people"><td>APP-LT-01</td><td><span class="badge badge-oth">Other</span></td><td class="num"><b>1</b></td><td class="num">0.1%</td></tr></tbody></table></div></div>
       <div class="card"><div class="sec-hdr">Headcount by Location</div><div class="tbl-wrap"><table>
         <thead><tr><th>Location</th><th class="num">HC</th><th class="num">% of HC</th></tr></thead>
         <tbody><tr><td>Bengaluru</td><td class="num"><b>704</b></td><td class="num">38.7%</td></tr>
@@ -223,6 +224,21 @@ tr:hover td{background:#f9f0ff}
 <tr><td>Ahmedabad</td><td class="num"><b>13</b></td><td class="num">0.7%</td></tr>
 <tr><td>Nagpur</td><td class="num"><b>13</b></td><td class="num">0.7%</td></tr>
 <tr><td>Jaipur</td><td class="num"><b>11</b></td><td class="num">0.6%</td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- DU DRILL-DOWN -->
+    <div class="card mb16" id="du-drill" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="sec-hdr" style="margin:0" id="du-drill-title"></div>
+        <select class="search-input" id="du-drill-level" style="max-width:130px" onchange="renderDuDrill()"><option value="">All levels</option></select>
+        <input class="search-input" id="du-drill-q" style="max-width:240px" placeholder="Filter name, EID, skill, project…" oninput="renderDuDrill()">
+        <button class="btn btn-ghost" onclick="exportDuDrill()">Export CSV</button>
+        <button class="btn btn-ghost" onclick="closeDuDrill()">Close ✕</button>
+      </div>
+      <div id="du-drill-summary" style="font-size:12px;color:var(--text-2);margin-bottom:10px"></div>
+      <div class="tbl-wrap" style="max-height:520px;overflow-y:auto"><table>
+        <thead><tr><th>Name</th><th>EID</th><th>Level</th><th>Location</th><th>Skill</th><th>Project</th><th>Roll-off</th><th>Lock</th><th>PM</th></tr></thead>
+        <tbody id="du-drill-body"></tbody></table></div>
     </div>
 
     <!-- Notice Period -->
@@ -684,29 +700,37 @@ function localAnswer(question) {
   var duData={"APP-NP-PS": 229, "APP-ALIP-PE": 227, "APP-HPS-AHSS": 166, "APTP": 155, "APP-ASCG-PE": 134, "APP-NP-PE": 123, "APP-AVS-PE": 111, "APP-LS-INTIENT-PE": 97, "APP-RAI-PE": 97, "APP-ASCG-OP-PS": 83, "APP-D&AI-PE": 82, "APP-AVS-PS": 81, "APP-LS-INTIENT-PS": 57, "APP-NFR-PE": 57, "APP-TechDoc-COE": 40, "APP-ACAN": 26, "APP Biz Enablement": 16, "APP-AFTP": 13, "APP-CFP": 12, "APP-ASCG-Cloud-PS": 6, "APP-ALV-PE": 4, "APP-LT-01": 1};
   var locData={"Bengaluru": 704, "Hyderabad": 345, "Chennai": 176, "Gurugram": 116, "Pune": 111, "Mumbai": 104, "Coimbatore": 64, "Kolkata": 58, "Noida": 50, "Bhubaneswar": 29, "Indore": 23, "Ahmedabad": 13, "Nagpur": 13, "Jaipur": 11};
 
-  // Name lookup
-  var nameMatch = RESOURCE_DATA.find(function(r){return q.includes(r.name.toLowerCase().split(' ')[0])||q.includes(r.name.toLowerCase());});
-  if(nameMatch && (q.includes(nameMatch.name.toLowerCase().split(' ')[0]) || q.includes(nameMatch.name.toLowerCase()))) {
+  // Name lookup (full name, or a name part typed as a whole word)
+  var qWords=q.split(/\s+/);
+  function w(x){return qWords.indexOf(x)>=0;}
+  var nameMatch=RESOURCE_DATA.find(function(r){return q.indexOf(r.name.toLowerCase())>=0;});
+  if(!nameMatch){
+    var cands=RESOURCE_DATA.filter(function(r){return r.name.toLowerCase().split(' ').some(function(t){return t.length>=4&&qWords.indexOf(t)>=0;});});
+    if(cands.length===1) nameMatch=cands[0];
+    else if(cands.length>1) return 'I found '+cands.length+' people with that name: '+cands.slice(0,5).map(function(r){return r.name;}).join(', ')+(cands.length>5?'…':'')+'. Please type the full name or EID.';
+  }
+  if(nameMatch) {
     var r=nameMatch;
     return r.name+' ('+r.level+') is in '+r.du+', '+r.location+'. Project: '+(r.project||'N/A')+'. Roll-off: '+(r.rolloff||'N/A')+'. Skill: '+r.skill+'. EID: '+r.eid+'.';
   }
 
-  if(q.includes('total')||q.includes('how many')||q.includes('headcount')||q.includes('hc')) {
+  if(q.includes('notice')||q.includes('resign')||q.includes('attrition')) return 'Notice period: 31 resources serving notice (1.7% of HC). SE: 11, SSE: 11, ASE: 4, TL: 3, AM: 1, M: 1.';
+  if(q.includes('gcp')) return 'There are '+gcp+' GCP (Global Career Program) resources.';
+  if(q.includes('reinvention')||w('rai')) return 'Reinvention.AI has '+rai+' resources across APP-NFR-PE, APP-TechDoc-COE, and APP-RAI-PE.';
+  if(w('ps')||q.includes('professional services')) return 'Professional Services (PS): '+ps+' resources.';
+  if(w('pe')||q.includes('product engineering')) return 'Product Engineering (PE): '+pe+' resources.';
+  if(q.includes('total')||q.includes('how many')||q.includes('headcount')||w('hc')) {
     if(q.includes('atci')||q.includes('locked')) return 'ATCI locked HC is '+atci.toLocaleString()+' out of '+total.toLocaleString()+' total.';
     return 'Total HC is '+total.toLocaleString()+'. ATCI locked: '+atci+'. GCP: '+gcp+'. RAI: '+rai+'. APP (non-RAI): '+appNonRai+'.';
   }
   if(q.includes('roll')&&(q.includes('off')||q.includes('out')||q.includes('90'))) {
     return ro90+' resources have a roll-off within 90 days (by 14 Feb 2027).';
   }
-  if(q.includes('gcp')) return 'There are '+gcp+' GCP (Global Career Program) resources.';
-  if(q.includes('reinvention')||q.includes('rai')) return 'Reinvention.AI has '+rai+' resources across APP-NFR-PE, APP-TechDoc-COE, and APP-RAI-PE.';
-  if(q.includes('ps')||q.includes('professional services')) return 'Professional Services (PS): '+ps+' resources.';
-  if(q.includes('pe')||q.includes('product engineering')) return 'Product Engineering (PE): '+pe+' resources.';
-  if(q.includes('fa')||q.includes('functional area')||q.includes('split')) return 'FA split: PS (Professional Services) = '+ps+', PE (Product Engineering) = '+pe+', Other = '+other+'.';
-  if(q.includes('level')||q.includes('ase')||q.includes('sse')||q.includes(' se ')||q.includes('grade')) {
+  if(w('fa')||q.includes('functional area')||q.includes('split')) return 'FA split: PS (Professional Services) = '+ps+', PE (Product Engineering) = '+pe+', Other = '+other+'.';
+  if(q.includes('level')||w('ase')||w('sse')||q.includes(' se ')||q.includes('grade')) {
     return 'Level breakdown: '+Object.keys(levelData).map(function(l){return l+': '+levelData[l];}).join(', ')+'.';
   }
-  if(q.includes('du')||q.includes('delivery unit')) {
+  if(w('du')||q.includes('delivery unit')) {
     var top=Object.keys(duData).slice(0,8).map(function(k){return k+': '+duData[k];}).join(', ');
     return 'Top DUs: '+top+'.';
   }
@@ -721,7 +745,6 @@ function localAnswer(question) {
   if(q.includes('alip')) return 'APP-ALIP-PE: '+duData['APP-ALIP-PE']+' resources.';
   if(q.includes('hps')||q.includes('ahss')) return 'APP-HPS-AHSS: '+duData['APP-HPS-AHSS']+' resources.';
   if(q.includes('aptp')) return 'APTP: '+duData['APTP']+' resources.';
-  if(q.includes('notice')||q.includes('resign')||q.includes('attrition')) return 'Notice period: 31 resources serving notice (1.7% of HC). SE: 11, SSE: 11, ASE: 4, TL: 3, AM: 1, M: 1.';
   if(q.includes('date')||q.includes('when')||q.includes('report')) return 'HC data is as of 16 Nov 2026.';
   return "I can help with total HC, level breakdowns, DU counts, location splits, roll-offs, FA splits, ATCI, GCP, RAI, and resource lookups by name or EID. What would you like to know?";
 }
@@ -739,6 +762,49 @@ function renderNoticeTable() {
 function scrollToNotice() {
   var el = document.getElementById('notice-detail-card');
   if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ─── DU DRILL-DOWN ───────────────────────────────────────────────────────────
+var duDrillCur='', duDrillRows=[];
+function esc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function openDuDrill(du) {
+  duDrillCur=du;
+  var sel=document.getElementById('du-drill-level'); sel.innerHTML='<option value="">All levels</option>';
+  LEVEL_ORDER.forEach(function(l){
+    var c=RESOURCE_DATA.filter(function(r){return r.du===du&&r.level===l;}).length;
+    if(c){var o=document.createElement('option');o.value=l;o.textContent=l+' ('+c+')';sel.appendChild(o);}
+  });
+  document.getElementById('du-drill-q').value='';
+  document.getElementById('du-drill').style.display='block';
+  renderDuDrill();
+  document.getElementById('du-drill').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderDuDrill() {
+  var lv=document.getElementById('du-drill-level').value;
+  var q=(document.getElementById('du-drill-q').value||'').toLowerCase().trim();
+  duDrillRows=RESOURCE_DATA.filter(function(r){
+    if(r.du!==duDrillCur) return false;
+    if(lv&&r.level!==lv) return false;
+    if(q&&(r.name+' '+r.eid+' '+r.pid+' '+r.skill+' '+r.project+' '+r.pm).toLowerCase().indexOf(q)<0) return false;
+    return true;
+  }).sort(function(a,b){return LEVEL_ORDER.indexOf(a.level)-LEVEL_ORDER.indexOf(b.level)||a.name.localeCompare(b.name);});
+  var all=RESOURCE_DATA.filter(function(r){return r.du===duDrillCur;}).length;
+  document.getElementById('du-drill-title').textContent=duDrillCur+' — People';
+  var lc={}; duDrillRows.forEach(function(r){lc[r.level]=(lc[r.level]||0)+1;});
+  document.getElementById('du-drill-summary').textContent='Showing '+duDrillRows.length+' of '+all+' · '+LEVEL_ORDER.filter(function(l){return lc[l];}).map(function(l){return l+': '+lc[l];}).join(', ');
+  document.getElementById('du-drill-body').innerHTML=duDrillRows.map(function(r){
+    var flag=r.resign?' <span class="badge" style="background:var(--red-lt);color:var(--red)">Notice</span>':'';
+    return '<tr><td>'+esc(r.name)+flag+'</td><td>'+esc(r.eid||'—')+'</td><td>'+esc(r.level)+'</td><td>'+esc(r.location)+'</td><td>'+esc(r.skill)+'</td><td>'+esc(r.project||'—')+'</td><td>'+esc(r.rolloff||'—')+'</td><td>'+esc(r.lock)+'</td><td>'+esc(r.pm||'—')+'</td></tr>';
+  }).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--text-2)">No matches.</td></tr>';
+}
+function closeDuDrill(){document.getElementById('du-drill').style.display='none';}
+function exportDuDrill() {
+  var cols=['name','eid','pid','level','du','location','skill','project','rolloff','lock','pm','rrd','resign','lwd'];
+  var csv=[cols.join(',')].concat(duDrillRows.map(function(r){return cols.map(function(c){return '"'+String(r[c]||'').replace(/"/g,'""')+'"';}).join(',');})).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=duDrillCur.replace(/[^A-Za-z0-9_-]+/g,'_')+'_people.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
